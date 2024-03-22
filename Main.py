@@ -7,3 +7,7 @@ import datetime as dt
 
 def main()->None:
     pass
+
+
+for u in range(20):
+    print(u)
