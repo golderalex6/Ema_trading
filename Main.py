@@ -7,3 +7,5 @@ import datetime as dt
 
 def main()->None:
     pass
+
+print('hehe')
