@@ -7,3 +7,6 @@ import datetime as dt
 
 def main()->None:
     pass
+
+for i in range(20):
+    print('hehloo')
