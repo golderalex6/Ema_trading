@@ -52,9 +52,11 @@ def regenerate_access_token():
 def read_value_spreadsheets(spreadsheet_id:str,ranges:str,majorDimension='ROWS'):
     with open('Credential.json','r+') as f:
         credential=json.loads(f.read())
-        api_key=credential['api_key']
-
-    get=requests.get(f'https://sheets.googleapis.com/v4/spreadsheets/{spreadsheet_id}/values:batchGet?key={api_key}&ranges={ranges}&majorDimension={majorDimension}').json()
+        access_token=credential['access_token']
+    
+    if not check_expired(access_token):
+        access_token=regenerate_access_token()
+    get=requests.get(f'https://sheets.googleapis.com/v4/spreadsheets/{spreadsheet_id}/values:batchGet?access_token={access_token}&ranges={ranges}&majorDimension={majorDimension}').json()
     return get['valueRanges'][0]['values']
     
 def write_value_spreadsheets(spreadsheet_id:str,ranges:str,values:list):
@@ -96,4 +98,8 @@ def append_value_spreadsheets(spreadsheet_id:str,range:str,values:list,insert_op
     append=requests.post(f'https://sheets.googleapis.com/v4/spreadsheets/{spreadsheet_id}/values/{range}:append?access_token={access_token}&valueInputOption=RAW&insertDataOption={insert_option}',data=json.dumps(val)).text
     return append
 
-scope='https://www.googleapis.com/auth/spreadsheets'
+
+if __name__ =='__main__':
+    scope='https://www.googleapis.com/auth/spreadsheets'
+    sheet_id='1Wp4cpdJpK3LKhI9Cf0_iRxJMzZ08YbdGaOlukZzgZLE'
+    print(read_value_spreadsheets(sheet_id,'Ema_val!A1:B2'))
