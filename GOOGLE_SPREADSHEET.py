@@ -102,4 +102,4 @@ def append_value_spreadsheets(spreadsheet_id:str,range:str,values:list,insert_op
 if __name__ =='__main__':
     scope='https://www.googleapis.com/auth/spreadsheets'
     sheet_id='1Wp4cpdJpK3LKhI9Cf0_iRxJMzZ08YbdGaOlukZzgZLE'
-    print(read_value_spreadsheets(sheet_id,'Ema_val!A1:B2'))
+    print(read_value_spreadsheets(sheet_id,'Ema_val!B2:B103'))

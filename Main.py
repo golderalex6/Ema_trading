@@ -12,14 +12,15 @@ load_dotenv()
 ema_fast=7
 ema_slow=70
 symbol='ETHUSDT'
-timeframe='15m'
-type='close'
+timeframe='1m'
+type='Close'
 #-----------Parameter
 
 #-----------Normal setup
 api_key=os.getenv('api_key')
 secret=os.getenv('secret')
 sheet_id='1Wp4cpdJpK3LKhI9Cf0_iRxJMzZ08YbdGaOlukZzgZLE'
+
 tf_to_sec={
     '1m':60,
     '3m':180,
@@ -34,8 +35,11 @@ tf_to_sec={
     '12h':43200,
     '1d':86400
 }
+col=np.array(['1m','3m','5m','15m','30m','1h','2h','4h','6h','8h','12h','1d'])
 col_index_start=np.array(['B2','C2','D2','E2','F2','G2','H2','I2','J2','K2','L2','M2'])
+only_value_start=np.array(['B4','C4','D4','E4','F4','G4','H4','I4','J4','K4','L4','M4'])
 col_index_end=np.array(['B103','C103','D103','E103','F103','G103','H103','I103','J103','K103','L103','M103'])
+
 exchange_id = 'binance'
 exchange_class = getattr(ccxt, exchange_id)
 exchange = exchange_class({
@@ -48,7 +52,7 @@ exchange.set_sandbox_mode(True)
 #-----------Function
 def handle_ohlvc(raw):
     df=pd.DataFrame(raw,columns=['Timestamp','Open','High','Low','Close','Volume'])
-    df['Date']=df['Timestamp'].map(lambda x:dt.datetime.fromtimestamp(x/1000))
+    df['Date']=df['Timestamp'].map(lambda x:dt.datetime.strftime(dt.datetime.fromtimestamp(x/1000),'%Y/%m/%d %H:%M:%S'))
 
     return df
 
@@ -59,30 +63,40 @@ def calculate_delay_time():
     now=np.array([dt.datetime.now().timestamp()]*12)
     time=np.array(list(tf_to_sec.values()))
     filter=(now-last)/time>1
-    
+
     return [np.array(list(tf_to_sec.keys()))[filter],[col_index_start[filter][0],col_index_end[filter][-1]]]
 
 def update_delay_time():
-    #update the new value for Ema after the gap time
-
-    delay_timeframe,delay_index=calculate_delay_time()
+    #update the new value for Ema after the gap time (or run for the first time when the sheet is clean)
+    try:
+        delay_timeframe,delay_index=calculate_delay_time()
+        start=delay_index[0]
+        end=delay_index[1]
+    except:
+        delay_timeframe=col
+        start=col_index_start[0]
+        end=col_index_end[-1]
+    
     price=[]
     date=[]
     timestamp=[]
+
     for i in delay_timeframe:
         get=handle_ohlvc(exchange.fetch_ohlcv(symbol,i,limit=2))
         price.append(get[type].values[0])
         date.append(get['Date'].values[0])
         timestamp.append(int(get['Timestamp'].values[0]))
+    
     data=[price for i in range(100)]
     data.insert(0,timestamp)
     data.insert(0,date)
+    
+    sheet.write_value_spreadsheets(sheet_id,f'Ema_val!{start}:{end}',data)
+    print('Updated done !!')
 
-    write=sheet.write_value_spreadsheets(sheet_id,f'Ema_val!{delay_index[0]}:{delay_index[1]}',data)
-    return write
 
-def Ema(tf,new_price):
-    rate=np.array([1.        , 0.66666667, 0.5       , 0.4       ,0.33333333,
+def Ema(tf,new_price,fast=7,slow=70):
+    k=np.array([1.        , 0.66666667, 0.5       , 0.4       ,0.33333333,
        0.28571429, 0.25      , 0.22222222, 0.2       , 0.18181818,
        0.16666667, 0.15384615, 0.14285714, 0.13333333, 0.125     ,
        0.11764706, 0.11111111, 0.10526316, 0.1       , 0.0952381 ,
@@ -103,7 +117,21 @@ def Ema(tf,new_price):
        0.02173913, 0.02150538, 0.0212766 , 0.02105263, 0.02083333,
        0.02061856, 0.02040816, 0.02020202, 0.02      , 0.01980198])
     
+    start=only_value_start[col==timeframe][0]
+    end=col_index_end[col==timeframe][0]
+    
+    old_ema_raw=sheet.read_value_spreadsheets(sheet_id,f'Ema_val!{start}:{end}')
+    old_ema=np.array(list(map(lambda x:x[0].replace(',','.'),old_ema_raw)),dtype='float')
 
+    new_ema=k*new_price+(1-k)*old_ema
+    data=new_ema.reshape((-1,1)).tolist()
+    
+    sheet.write_value_spreadsheets(sheet_id,f'Ema_val!{start}:{end}',data)
+    
+    return [
+        [old_ema[fast],new_ema[fast]],
+        [old_ema[slow],new_ema[slow]]
+    ]
 
 def round_time(tf):
     #wait to the nearest time frame
@@ -113,6 +141,7 @@ def round_time(tf):
     while True:
         n=dt.datetime.now()
         if (int(n.timestamp())-standard_time)%sec==0:
+            #print(dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S'))
             return
 
 def main()->None:
@@ -123,8 +152,11 @@ def main()->None:
             round_time(timeframe)
             first_procedure=True
         
-        sleep(tf_to_sec[timeframe])
-
+        price=handle_ohlvc(exchange.fetch_ohlcv(symbol,timeframe,limit=2))[type].values[0]
+        fast,slow=Ema(timeframe,price,ema_fast,ema_slow)
+        print(fast,slow,dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S'))
+        
+        round_time(timeframe)
 #-----------Function
 
 if __name__=='__main__':
