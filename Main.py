@@ -20,7 +20,7 @@ type='close'
 api_key=os.getenv('api_key')
 secret=os.getenv('secret')
 sheet_id='1Wp4cpdJpK3LKhI9Cf0_iRxJMzZ08YbdGaOlukZzgZLE'
-timeframe={
+tf_to_sec={
     '1m':60,
     '3m':180,
     '5m':300,
@@ -56,24 +56,39 @@ def calculate_delay_time():
 
     last=np.array(sheet.read_value_spreadsheets(sheet_id,'Ema_val!B3:M3')[0],dtype='int64')
     now=np.array([dt.datetime.now().timestamp()]*12)
-    time=np.array(list(timeframe.values()))
+    time=np.array(list(tf_to_sec.values()))
     filter=(now-last)/time>1
 
-    return [np.array(list(timeframe.keys()))[filter],col_index[filter]]
+    return [np.array(list(tf_to_sec.keys()))[filter],col_index[filter]]
 
 def update_delay_time():
     #update the new value for Ema after the gap time
 
     delay_timeframe,delay_index=calculate_delay_time()
-    price=handle_ohlvc(exchange.fetch_ohlcv(symbol,timeframe,limit=1))[type]
-    
-def round_time():
+    price=[]
+    date=[]
+    timestamp=[]
+    for i in delay_timeframe:
+        get=handle_ohlvc(exchange.fetch_ohlcv(symbol,i,limit=2))
+        price.append(get[type].values[0])
+        date.append(get['Date'].values[0])
+        timestamp.append(int(get['Timestamp'].values[0]))
+    data=[price for i in range(100)]
+    data.insert(0,timestamp)
+    data.insert(0,date)
+
+    write=sheet.write_value_spreadsheets(sheet_id,f'Ema_val!{delay_index[0]}:{delay_index[1]}',data)
+    return write
+
+
+def round_time(tf):
     #wait to the nearest time frame
 
+    sec=timeframe[tf]
     standard_time=dt.datetime(2024,1,1,7,0).timestamp()
     while True:
         n=dt.datetime.now()
-        if (int(n.timestamp())-standard_time)%60==0:
+        if (int(n.timestamp())-standard_time)%sec==0:
             print(n,n.timestamp())
             return
 
