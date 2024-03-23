@@ -14,11 +14,12 @@ ema_slow=70
 symbol='ETHUSDT'
 timeframe='1m'
 type='Close'
+balance=100
 #-----------Parameter
 
 #-----------Normal setup
-api_key=os.getenv('api_key')
-secret=os.getenv('secret')
+api_key=os.getenv('api_key_test')
+secret=os.getenv('secret_test')
 sheet_id='1Wp4cpdJpK3LKhI9Cf0_iRxJMzZ08YbdGaOlukZzgZLE'
 
 tf_to_sec={
@@ -144,6 +145,24 @@ def round_time(tf):
             #print(dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S'))
             return
 
+def cross_over(fast,slow):
+    if fast[0]<=slow[0] and fast[1]>slow[1]:
+        return True
+    else:
+        return False
+
+def cross_under(fast,slow):
+    if fast[0]>=slow[0] and fast[1]<slow[1]:
+        return True
+    else:
+        return False
+
+def trading_log():
+    pass
+
+def trading_log_detail():
+    pass
+
 def main()->None:
     first_procedure=False
     while True:
@@ -154,8 +173,18 @@ def main()->None:
         
         price=handle_ohlvc(exchange.fetch_ohlcv(symbol,timeframe,limit=2))[type].values[0]
         fast,slow=Ema(timeframe,price,ema_fast,ema_slow)
-        print(fast,slow,dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S'))
         
+        now=dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S')
+        traded=False
+        if cross_over(fast,slow):
+            print(now,'Buy')
+            traded=True
+        if cross_under(fast,slow):
+            print(now,'Sell')
+            traded=True
+        if traded==False:
+            print(now,'Waiting ...')
+
         round_time(timeframe)
 #-----------Function
 
