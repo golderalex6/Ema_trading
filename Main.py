@@ -136,7 +136,6 @@ def Ema(tf,new_price,fast=7,slow=70):
     start=only_value_start[col==timeframe][0]
     end=col_index_end[col==timeframe][0]
     
-    print(end)
     old_ema_raw=sheet.read_value_spreadsheets(sheet_id,f'Ema_val!{start}:{end}')
     old_ema=np.array(list(map(lambda x:x[0].replace(',','.'),old_ema_raw)),dtype='float')
 
