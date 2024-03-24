@@ -7,6 +7,7 @@ import datetime as dt
 from dotenv import load_dotenv
 import os
 load_dotenv()
+from math import *
 
 #-----------Parameter
 ema_fast=7
@@ -52,6 +53,8 @@ exchange.set_sandbox_mode(True)
 
 #-----------Function
 def handle_ohlvc(raw):
+    #convert raw data crawled from binance to dataframe pandas for easy process
+
     df=pd.DataFrame(raw,columns=['Timestamp','Open','High','Low','Close','Volume'])
     df['Date']=df['Timestamp'].map(lambda x:dt.datetime.strftime(dt.datetime.fromtimestamp(x/1000),'%Y/%m/%d %H:%M:%S'))
 
@@ -60,19 +63,29 @@ def handle_ohlvc(raw):
 def calculate_delay_time():
     #check time gap from the last turn off untill now
 
-    last=np.array(sheet.read_value_spreadsheets(sheet_id,'Ema_val!B3:M3')[0],dtype='int')
-    now=np.array([dt.datetime.now().timestamp()]*12)
-    time=np.array(list(tf_to_sec.values()))
+    last=np.array(sheet.read_value_spreadsheets(sheet_id,'Ema_val!B3:M3')[0],dtype='int64')/1000
+    now=np.array([dt.datetime.now().timestamp()]*len(col))
+    time=np.array(list(tf_to_sec.values()))*2 #we multiply by 2 because we backward 1 timeframe so we have to calculate the timeframe today plus yesterday
     filter=(now-last)/time>1
 
-    return [np.array(list(tf_to_sec.keys()))[filter],[col_index_start[filter][0],col_index_end[filter][-1]]]
+    delay_timeframe=np.array(list(tf_to_sec.keys()))[filter]
+    start=col_index_start[filter]
+    end=col_index_end[filter]
+
+    return [delay_timeframe,[start,end]]
 
 def update_delay_time():
     #update the new value for Ema after the gap time (or run for the first time when the sheet is clean)
+    
     try:
         delay_timeframe,delay_index=calculate_delay_time()
         start=delay_index[0]
         end=delay_index[1]
+        if len(start)==0:
+            print('Nothing to update !!')
+            return
+        start=start[0]
+        end=end[-1]
     except:
         delay_timeframe=col
         start=col_index_start[0]
@@ -93,10 +106,12 @@ def update_delay_time():
     data.insert(0,date)
     
     sheet.write_value_spreadsheets(sheet_id,f'Ema_val!{start}:{end}',data)
-    print('Updated done !!')
+    print('Updated done !!','Updated timeframe :',delay_timeframe)
 
 
 def Ema(tf,new_price,fast=7,slow=70):
+    #calculate Ema value and write to google sheet
+
     k=np.array([1.        , 0.66666667, 0.5       , 0.4       ,0.33333333,
        0.28571429, 0.25      , 0.22222222, 0.2       , 0.18181818,
        0.16666667, 0.15384615, 0.14285714, 0.13333333, 0.125     ,
@@ -121,6 +136,7 @@ def Ema(tf,new_price,fast=7,slow=70):
     start=only_value_start[col==timeframe][0]
     end=col_index_end[col==timeframe][0]
     
+    print(end)
     old_ema_raw=sheet.read_value_spreadsheets(sheet_id,f'Ema_val!{start}:{end}')
     old_ema=np.array(list(map(lambda x:x[0].replace(',','.'),old_ema_raw)),dtype='float')
 
@@ -139,31 +155,41 @@ def round_time(tf):
 
     sec=tf_to_sec[tf]
     standard_time=dt.datetime(2024,1,1,7,0).timestamp()
-    while True:
-        n=dt.datetime.now()
-        if (int(n.timestamp())-standard_time)%sec==0:
-            #print(dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S'))
-            return
+    n=dt.datetime.now().timestamp()
+
+    if (int(n)-standard_time)%sec==0:
+        print(dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S'))
+        return
+    gap=ceil((n-standard_time)/sec)*sec-(n-standard_time)
+    sleep(gap)
+    print(dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S'))
 
 def cross_over(fast,slow):
+    #check if the fast ema is cross over the slow one
+
     if fast[0]<=slow[0] and fast[1]>slow[1]:
         return True
     else:
         return False
 
 def cross_under(fast,slow):
+    #check if the fast ema is cross under the slow one
+
     if fast[0]>=slow[0] and fast[1]<slow[1]:
         return True
     else:
         return False
 
 def trading_log():
+    #write
     pass
 
 def trading_log_detail():
     pass
 
 def main()->None:
+    #run the trading application
+
     first_procedure=False
     while True:
         if not first_procedure:
@@ -184,7 +210,7 @@ def main()->None:
             traded=True
         if traded==False:
             print(now,'Waiting ...')
-
+        
         round_time(timeframe)
 #-----------Function
 
