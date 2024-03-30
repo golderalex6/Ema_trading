@@ -3,3 +3,4 @@ pandas
 requests
 ccxt
 python-dotenv
+binance-futures-connector

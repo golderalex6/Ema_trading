@@ -1,25 +1,9 @@
-import datetime as dt
-import pandas as pd
-import requests
-import numpy as np
-import os
-import ccxt
-from math import *
-from time import sleep
+import sys
+sys.path.append('D:\\Trading')
+from IMPORT import *
 
-#-----------Parameter
-ema_fast=7
-ema_slow=70
-symbol='ETHUSDT'
-timeframe='1m'
-type='Close'
-#-----------Parameter
-
-#-----------Normal setup
 __location__=os.path.dirname(__file__)
-exchange=ccxt.binance()
-col=np.array(['1m','3m','5m','15m','30m','1h','2h','4h','6h','8h','12h','1d'])
-#-----------Normal setup
+client=UMFutures(PARA.api_key,PARA.secret,base_url=PARA.base_url)
 
 #-----------Function
 def handle_ohlvc(raw):
@@ -33,58 +17,61 @@ def handle_ohlvc(raw):
 def Ema():
     #Calculate the Ema values
 
-    price=[]
-    date=[]
-    timestamp=[]
+    
     index=['Date','Timestamp']
     index.extend([f'Ema_{i}' for i in range(1,101)])
-        
-    for i in col:
-        get=handle_ohlvc(exchange.fetch_ohlcv(symbol,i,limit=2))
-        price.append(get[type].values[0])
-        date.append(get['Date'].values[0])
-        timestamp.append(int(get['Timestamp'].values[0]))
+    now_min=int(dt.datetime.now().timestamp()/60)
+    updated_col=[]
+    for i in PARA.col:
+        price=[]
+        date=[]
+        timestamp=[]
+        if (now_min-PARA.standard_min)%PARA.tf_to_min[i]==0:
+            updated_col.append(i)
+            get=handle_ohlvc([client.continuous_klines(pair=PARA.symbol,contractType='PERPETUAL',interval=i,limit=1)[0][:6]])
+            price.append(get[PARA.type].values[0])
+            date.append(get['Date'].values[0])
+            timestamp.append(int(get['Timestamp'].values[0]))
 
-    data=[price for i in range(100)]
-    data.insert(0,timestamp)
-    data.insert(0,date)
+            data=[price for i in range(100)]
+            data.insert(0,timestamp)
+            data.insert(0,date)
 
-    new_values=np.array(data[2:])
-    
-    try:
-        df=pd.read_csv(os.path.join(__location__,'Ema.csv'),index_col=0)
-        k=np.array([[2/(i+1)] for i in range(1,101)])
-        old_values=df.iloc[2:].to_numpy(dtype='float')
+            new_values=np.array(data[2:],dtype='float')
+            
+            try:
+                df=pd.read_csv(os.path.join(__location__,f'Ema_{i}.csv'),index_col=0)
+                k=np.array([[2/(i+1)] for i in range(1,101)])
+                old_values=df.iloc[2:].to_numpy(dtype='float')
 
-        new_ema=(np.multiply(new_values,k)+np.multiply(old_values,1-k)).tolist()
-        new_ema.insert(0,timestamp)
-        new_ema.insert(0,date)
+                new_ema=(np.multiply(new_values,k)+np.multiply(old_values,1-k)).tolist()
+                new_ema.insert(0,timestamp)
+                new_ema.insert(0,date)
 
-        new_df=pd.DataFrame(new_ema,columns=col,index=index)
-        new_df.to_csv(os.path.join(__location__,'Ema.csv'))
-    except:
-        
-        df=pd.DataFrame(data,columns=col,index=index)
-        df.to_csv(os.path.join(__location__,'Ema.csv'))
+                new_df=pd.DataFrame(new_ema,columns=[i],index=index)
+                new_df.to_csv(os.path.join(__location__,f'Ema_{i}.csv'))
+            
+            except:
+                
+                df=pd.DataFrame(data,columns=[i],index=index)
+                df.to_csv(os.path.join(__location__,f'Ema_{i}.csv'))
+
+    print('Updated timeframe :',updated_col)
 
 def round_time():
     #wait to the nearest time frame
 
     sec=60
-    standard_time=dt.datetime(2024,1,1,7,0).timestamp()
     n=dt.datetime.now().timestamp()
 
-    if (int(n)-standard_time)%sec==0:
-        print(dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S'))
-        return
-    gap=ceil((n-standard_time)/sec)*sec-(n-standard_time)
+    gap=ceil((n-PARA.standard_sec)/sec)*sec-(n-PARA.standard_sec)
     sleep(gap)
     print(dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S'))
 
 def Main():
     while True:
-        Ema()
         round_time()
+        Ema()
 #-----------Function
 
 if __name__=="__main__":

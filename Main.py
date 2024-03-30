@@ -1,52 +1,9 @@
-import ccxt
-import pandas as pd
-import numpy as np
-import GOOGLE_SPREADSHEET as sheet
-from time import sleep
-import datetime as dt
-from dotenv import load_dotenv
-import os
-load_dotenv()
-from math import *
-
-#-----------Parameter
-ema_fast=7
-ema_slow=70
-symbol='ETHUSDT'
-timeframe='1m'
-type='Close'
-balance=100
-#-----------Parameter
+from IMPORT import *
 
 #-----------Normal setup
 __location__=os.path.dirname(__file__)
-api_key=os.getenv('api_key_test')
-secret=os.getenv('secret_test')
-sheet_id='1Wp4cpdJpK3LKhI9Cf0_iRxJMzZ08YbdGaOlukZzgZLE'
-
-tf_to_sec={
-    '1m':60,
-    '3m':180,
-    '5m':300,
-    '15m':900,
-    '30m':1800,
-    '1h':3600,
-    '2h':7200,
-    '4h':14400,
-    '6h':21600,
-    '8h':28800,
-    '12h':43200,
-    '1d':86400
-}
-col=np.array(['1m','3m','5m','15m','30m','1h','2h','4h','6h','8h','12h','1d'])
-
-exchange_id = 'binance'
-exchange_class = getattr(ccxt, exchange_id)
-exchange = exchange_class({
-    'apiKey': api_key,
-    'secret': secret,
-})
-exchange.set_sandbox_mode(True)
+client = UMFutures(PARA.api_key,PARA.secret,base_url=PARA.base_url)
+client.change_leverage(PARA.symbol,1)
 #-----------Normal setup
 
 #-----------Function
@@ -61,7 +18,7 @@ def handle_ohlvc(raw):
 def round_time(tf):
     #wait to the nearest time frame
 
-    sec=tf_to_sec[tf]
+    sec=PARA.tf_to_sec[tf]
     standard_time=dt.datetime(2024,1,1,7,0).timestamp()
     n=dt.datetime.now().timestamp()
 
@@ -88,38 +45,76 @@ def cross_under(fast,slow):
     else:
         return False
 
-def trading_log():
-    #write
-    pass
+def trading_log(date:str,order_type:str,amount:float,open:float,close:float):
+    #write trading history for future query
+    
+    fee=0.002
+    total_fee=fee*(amount+amount*close/open)
 
+    win_per=None
+    if order_type=='BUY':
+        win_per=(close-open)/open
+    else:
+        win_per=(open-close)/close
+
+    win_usd=amount*win_per-total_fee
+    history_log=[date,order_type,total_fee,amount,open,close,win_per,win_usd]
+
+    sheet.append_value_spreadsheets(PARA.sheet_id,'Trading_log!A1:H1',[history_log])
 
 def main()->None:
     #run the trading application
-    check=pd.read_csv(os.path.join(__location__,'Indicator\\Ema.csv'),index_col=0)
+    check=pd.read_csv(os.path.join(__location__,f'Indicator\\Ema_{PARA.timeframe}.csv'),index_col=0)
 
     while True:
-        new=pd.read_csv(os.path.join(__location__,'Indicator\\Ema.csv'),index_col=0)
+        new=pd.read_csv(os.path.join(__location__,f'Indicator\\Ema_{PARA.timeframe}.csv'),index_col=0)
 
         if not check.equals(new):
-
-            fast_old,slow_old=check.loc[[f'Ema_{ema_fast}',f'Ema_{ema_slow}'],timeframe].values
-            fast_new,slow_new=new.loc[[f'Ema_{ema_fast}',f'Ema_{ema_slow}'],timeframe].values
+            
+            #Get the Ema value
+            fast_old,slow_old=check.loc[[f'Ema_{PARA.ema_fast}',f'Ema_{PARA.ema_slow}']].values
+            fast_new,slow_new=new.loc[[f'Ema_{PARA.ema_fast}',f'Ema_{PARA.ema_slow}']].values
             fast,slow=[fast_old,fast_new],[slow_old,slow_new]
             
             now=dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S')
-            traded=False
+            
+            open_position=False
+            latest_quant=None
+            order_books=client.depth(PARA.symbol,limit=5)
+            open_price=None
+            close_price=None
 
             if cross_over(fast,slow):
+                #close the sell order and create a new buy order
+
                 print(now,'Buy')
-                traded=True
+                if open_position:
+                    client.new_order(symbol=PARA.symbol,side='BUY',type='MARKET',quantity=latest_quant)
+                    close_price=float(order_books['asks'][0][0])
+                    trading_log(now,'SELL',latest_quant,open_price,close_price)
+
+                quantity=PARA.balance/float(order_books['asks'][0][0])
+                client.new_order(symbol=PARA.symbol,side='BUY',type='MARKET',quantity=quantity)
+                open_position=True
+                latest_quant=quantity
+                open_price=float(order_books['asks'][0][0])
+
             if cross_under(fast,slow):
+                #close the buy order and create a new sell order
+
                 print(now,'Sell')
-                traded=True
-            if traded==False:
-                print(now,fast,slow)
+                if open_position:
+                    client.new_order(symbol=PARA.symbol,side='SELL',type='MARKET',quantity=latest_quant)
+                    close_price=float(order_books['bids'][0][0])
+                    trading_log(now,'BUY',latest_quant,open_price,close_price)
+
+                quantity=PARA.balance/float(order_books['bids'][0][0])
+                client.new_order(symbol=PARA.symbol,side='SELL',type='MARKET',quantity=quantity)
+                open_position=True
+                latest_quant=quantity
+                open_price=float(order_books['bids'][0][0])
+
             check=new
-        else:
-            print('No update')
         sleep(0.5)
         
 #-----------Function
