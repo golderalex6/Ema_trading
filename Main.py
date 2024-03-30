@@ -7,6 +7,8 @@ client.change_leverage(PARA.symbol,1)
 #-----------Normal setup
 
 #-----------Function
+def round_down_nth(d,n):
+    return floor(d*10**(n))/10**n
 def handle_ohlvc(raw):
     #convert raw data crawled from binance to dataframe pandas for easy process
 
@@ -93,7 +95,7 @@ def main()->None:
                     close_price=float(order_books['asks'][0][0])
                     trading_log(now,'SELL',latest_quant,open_price,close_price)
 
-                quantity=PARA.balance/float(order_books['asks'][0][0])
+                quantity=round_down_nth(PARA.balance/float(order_books['asks'][0][0]),3)
                 client.new_order(symbol=PARA.symbol,side='BUY',type='MARKET',quantity=quantity)
                 open_position=True
                 latest_quant=quantity
@@ -108,7 +110,7 @@ def main()->None:
                     close_price=float(order_books['bids'][0][0])
                     trading_log(now,'BUY',latest_quant,open_price,close_price)
 
-                quantity=PARA.balance/float(order_books['bids'][0][0])
+                quantity=round_down_nth(PARA.balance/float(order_books['bids'][0][0]),3)
                 client.new_order(symbol=PARA.symbol,side='SELL',type='MARKET',quantity=quantity)
                 open_position=True
                 latest_quant=quantity
