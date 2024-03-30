@@ -1,5 +1,5 @@
 import sys
-sys.path.append('D:\\Trading')
+sys.path.append('/Working/Trading')
 from IMPORT import *
 
 __location__=os.path.dirname(__file__)

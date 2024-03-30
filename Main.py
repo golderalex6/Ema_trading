@@ -64,10 +64,10 @@ def trading_log(date:str,order_type:str,amount:float,open:float,close:float):
 
 def main()->None:
     #run the trading application
-    check=pd.read_csv(os.path.join(__location__,f'Indicator\\Ema_{PARA.timeframe}.csv'),index_col=0)
+    check=pd.read_csv(os.path.join(__location__,f'Indicator/Ema_{PARA.timeframe}.csv'),index_col=0)
 
     while True:
-        new=pd.read_csv(os.path.join(__location__,f'Indicator\\Ema_{PARA.timeframe}.csv'),index_col=0)
+        new=pd.read_csv(os.path.join(__location__,f'Indicator/Ema_{PARA.timeframe}.csv'),index_col=0)
 
         if not check.equals(new):
             
