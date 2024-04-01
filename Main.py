@@ -67,7 +67,12 @@ def trading_log(date:str,order_type:str,amount:float,open:float,close:float):
 def main()->None:
     #run the trading application
     check=pd.read_csv(os.path.join(__location__,f'Indicator/Ema_{PARA.timeframe}.csv'),index_col=0)
-
+    
+    open_position=False
+    latest_quant=None
+    open_price=None
+    close_price=None
+    
     while True:
         new=pd.read_csv(os.path.join(__location__,f'Indicator/Ema_{PARA.timeframe}.csv'),index_col=0)
 
@@ -79,12 +84,8 @@ def main()->None:
             fast,slow=[fast_old,fast_new],[slow_old,slow_new]
             
             now=dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S')
-            
-            open_position=False
-            latest_quant=None
+                        
             order_books=client.depth(PARA.symbol,limit=5)
-            open_price=None
-            close_price=None
 
             if cross_over(fast,slow):
                 #close the sell order and create a new buy order
