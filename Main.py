@@ -74,7 +74,12 @@ def main()->None:
     close_price=None
     
     while True:
-        new=pd.read_csv(os.path.join(__location__,f'Indicator/Ema_{PARA.timeframe}.csv'),index_col=0)
+        while True:
+            try:
+                new=pd.read_csv(os.path.join(__location__,f'Indicator/Ema_{PARA.timeframe}.csv'),index_col=0)
+                break
+            except:
+                sleep(0.5)
 
         if not check.equals(new):
             
