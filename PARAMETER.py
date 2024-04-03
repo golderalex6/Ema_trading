@@ -3,7 +3,7 @@ from IMPORT import *
 ema_fast=7
 ema_slow=70
 symbol='BTCUSDT'
-timeframe='1m'
+timeframe='15m'
 type='Close'
 balance=150
 #-----------Main Parameter
