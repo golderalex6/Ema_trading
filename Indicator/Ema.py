@@ -67,7 +67,7 @@ def Ema():
             df=pd.DataFrame(data,columns=[i],index=index)
             df.to_csv(os.path.join(__location__,f'Ema_{i}.csv'))
 
-    print('Updated timeframe :',updated_col)
+    print('Updated timeframe :',update_col)
 
 def round_time():
     #wait to the nearest time frame
