@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(1,'/Working/Trading/')
+sys.path.append('/home/golderalex2/Downloads/Working/Trading')
 from IMPORT import *
 
 __location__=os.path.dirname(__file__)
