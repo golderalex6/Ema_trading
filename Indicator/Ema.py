@@ -1,5 +1,5 @@
 import sys
-sys.path.append('/Working/Trading')
+sys.path.insert(1,'/Working/Trading/')
 from IMPORT import *
 
 __location__=os.path.dirname(__file__)
@@ -14,47 +14,58 @@ def handle_ohlvc(raw):
 
     return df
 
+def updated_columns():
+    #Return the columns that need to update at that time
+
+    now_min=int(dt.datetime.now().timestamp()/60)
+    updated_col=[]
+    for i in PARA.col:
+        if (now_min-PARA.standard_min)%PARA.tf_to_min[i]==0:
+            updated_col.append(i)
+    
+    return updated_col
+
 def Ema():
     #Calculate the Ema values
 
     
     index=['Date','Timestamp']
     index.extend([f'Ema_{i}' for i in range(1,101)])
-    now_min=int(dt.datetime.now().timestamp()/60)
-    updated_col=[]
-    for i in PARA.col:
+    
+    update_col=updated_columns()
+    for i in update_col:
+
         price=[]
         date=[]
         timestamp=[]
-        if (now_min-PARA.standard_min)%PARA.tf_to_min[i]==0:
-            updated_col.append(i)
-            get=handle_ohlvc([client.continuous_klines(pair=PARA.symbol,contractType='PERPETUAL',interval=i,limit=1)[0][:6]])
-            price.append(get[PARA.type].values[0])
-            date.append(get['Date'].values[0])
-            timestamp.append(int(get['Timestamp'].values[0]))
+    
+        get=handle_ohlvc([client.continuous_klines(pair=PARA.symbol,contractType='PERPETUAL',interval=i,limit=1)[0][:6]])
+        price.append(get[PARA.type].values[0])
+        date.append(get['Date'].values[0])
+        timestamp.append(int(get['Timestamp'].values[0]))
 
-            data=[price for i in range(100)]
-            data.insert(0,timestamp)
-            data.insert(0,date)
+        data=[price for i in range(100)]
+        data.insert(0,timestamp)
+        data.insert(0,date)
 
-            new_values=np.array(data[2:],dtype='float')
+        new_values=np.array(data[2:],dtype='float')
+        
+        try:
+            df=pd.read_csv(os.path.join(__location__,f'Ema_{i}.csv'),index_col=0)
+            k=np.array([[2/(i+1)] for i in range(1,101)])
+            old_values=df.iloc[2:].to_numpy(dtype='float')
+
+            new_ema=(np.multiply(new_values,k)+np.multiply(old_values,1-k)).tolist()
+            new_ema.insert(0,timestamp)
+            new_ema.insert(0,date)
+
+            new_df=pd.DataFrame(new_ema,columns=[i],index=index)
+            new_df.to_csv(os.path.join(__location__,f'Ema_{i}.csv'))
+        
+        except:
             
-            try:
-                df=pd.read_csv(os.path.join(__location__,f'Ema_{i}.csv'),index_col=0)
-                k=np.array([[2/(i+1)] for i in range(1,101)])
-                old_values=df.iloc[2:].to_numpy(dtype='float')
-
-                new_ema=(np.multiply(new_values,k)+np.multiply(old_values,1-k)).tolist()
-                new_ema.insert(0,timestamp)
-                new_ema.insert(0,date)
-
-                new_df=pd.DataFrame(new_ema,columns=[i],index=index)
-                new_df.to_csv(os.path.join(__location__,f'Ema_{i}.csv'))
-            
-            except:
-                
-                df=pd.DataFrame(data,columns=[i],index=index)
-                df.to_csv(os.path.join(__location__,f'Ema_{i}.csv'))
+            df=pd.DataFrame(data,columns=[i],index=index)
+            df.to_csv(os.path.join(__location__,f'Ema_{i}.csv'))
 
     print('Updated timeframe :',updated_col)
 

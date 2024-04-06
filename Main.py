@@ -36,16 +36,14 @@ def cross_over(fast,slow):
 
     if fast[0]<=slow[0] and fast[1]>slow[1]:
         return True
-    else:
-        return False
+    return False
 
 def cross_under(fast,slow):
     #check if the fast ema is cross under the slow one
 
     if fast[0]>=slow[0] and fast[1]<slow[1]:
         return True
-    else:
-        return False
+    return False
 
 def trading_log(date:str,order_type:str,amount:float,open:float,close:float):
     #write trading history for future query
