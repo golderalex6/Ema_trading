@@ -4,9 +4,6 @@ import subprocess
 import pandas as pd
 import os
 from time import sleep
-import zipfile as zf
-import scipy
-import os
 
 def get_auth_url(scope):
     with open('Credential.json','r+') as f:
