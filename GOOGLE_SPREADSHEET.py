@@ -116,9 +116,9 @@ def delete_rows_columns(spreadsheet_id:str,sheet_code:int,fr:int,t:int,dimension
     if not check_expired(access_token):
         access_token=regenerate_access_token()
     m=requests.post(f'https://sheets.googleapis.com/v4/spreadsheets/{spreadsheet_id}:batchUpdate?access_token={access_token}',data=json.dumps(val))
-    return m
+    return m.json()
 if __name__ =='__main__':
     scope='https://www.googleapis.com/auth/spreadsheets'
     sheet_id='1Wp4cpdJpK3LKhI9Cf0_iRxJMzZ08YbdGaOlukZzgZLE'
     m=[1]*106
-    print(read_value_spreadsheets(sheet_id,'1m!A1:ZZ1'))
+    print(delete_rows_columns(sheet_id,134407002,1,2))
