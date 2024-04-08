@@ -38,6 +38,7 @@ def trading_log(date:str,order_type:str,amount:float,open:float,close:float):
 
     win_usd=amount*win_per-total_fee
     history_log=[date,order_type,total_fee,amount,open,close,win_per,win_usd]
+    history_log=F.convert_number(history_log)
 
     sheet.append_value_spreadsheets(PARA.sheet_id,'Trading_log!A1:H1',[history_log])
 

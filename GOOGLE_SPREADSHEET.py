@@ -120,5 +120,5 @@ def delete_rows_columns(spreadsheet_id:str,sheet_code:int,fr:int,t:int,dimension
 if __name__ =='__main__':
     scope='https://www.googleapis.com/auth/spreadsheets'
     sheet_id='1Wp4cpdJpK3LKhI9Cf0_iRxJMzZ08YbdGaOlukZzgZLE'
-    m=[1.6]*3
+    m=['122,6745']*3
     print(append_value_spreadsheets(sheet_id,'testing!A1:ZZ1',[m]))

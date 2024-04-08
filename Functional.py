@@ -19,3 +19,5 @@ def updated_columns():
     
     return updated_col
 
+def convert_number(data:list):
+    return list(map(lambda x:str(x).replace('.',','),data))
