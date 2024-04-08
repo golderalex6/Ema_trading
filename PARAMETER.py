@@ -20,4 +20,18 @@ standard_sec=dt.datetime(2024,1,1,7,0).timestamp()
 standard_min=int(standard_sec/60)
 base_url='https://testnet.binancefuture.com' #CHANGE TO MAIN NET WHEN START TRADING
 
+sheet_code={
+        '1m':134407002,
+        '3m':1813264320,
+        '5m':803501045,
+        '15m':551184744,
+        '30m':754392554,
+        '1h':66986647,
+        '2h':259425711,
+        '4h':822980499,
+        '6h':1865172729,
+        '8h':30053299,
+        '12h':1111891270,
+        '1d':878999563,
+        }
 #-----------Normal setup
