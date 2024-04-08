@@ -26,7 +26,7 @@ def Draw():
         length=len(sheet.read_value_spreadsheets(PARA.sheet_id,f"{i}!A:A"))
         if length>71:
             sheet.delete_rows_columns(PARA.sheet_id,PARA.sheet_code[i],1,2)
-        ema_val=list(pd.read_csv(os.path.join(__location__,f'Indicator/Ema_{i}.csv)'),index_col=0)[i].values)
+        ema_val=list(pd.read_csv(os.path.join(__location__,f'Indicator/Ema_{i}.csv'),index_col=0)[i].values)
         price=client.continuous_klines(pair=PARA.symbol,contractType='PERPETUAL',interval=i,limit=1)[0][:6]
         price.extend(ema_val)
         
