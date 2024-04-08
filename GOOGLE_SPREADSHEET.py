@@ -63,7 +63,7 @@ def write_value_spreadsheets(spreadsheet_id:str,ranges:str,values:list):
     
     val={'range':ranges,'values':values}
     data={
-            'valueInputOption':"RAW",
+            'valueInputOption':"USER_ENTERED",
             'data':val
     }
 
@@ -92,7 +92,7 @@ def append_value_spreadsheets(spreadsheet_id:str,range:str,values:list,insert_op
     if not check_expired(access_token):
         access_token=regenerate_access_token()
     
-    append=requests.post(f'https://sheets.googleapis.com/v4/spreadsheets/{spreadsheet_id}/values/{range}:append?access_token={access_token}&valueInputOption=RAW&insertDataOption={insert_option}',data=json.dumps(val)).text
+    append=requests.post(f'https://sheets.googleapis.com/v4/spreadsheets/{spreadsheet_id}/values/{range}:append?access_token={access_token}&valueInputOption=USER_ENTERED&insertDataOption={insert_option}',data=json.dumps(val)).text
     return append
 
 def delete_rows_columns(spreadsheet_id:str,sheet_code:int,fr:int,t:int,dimension='ROWS'):
@@ -120,5 +120,5 @@ def delete_rows_columns(spreadsheet_id:str,sheet_code:int,fr:int,t:int,dimension
 if __name__ =='__main__':
     scope='https://www.googleapis.com/auth/spreadsheets'
     sheet_id='1Wp4cpdJpK3LKhI9Cf0_iRxJMzZ08YbdGaOlukZzgZLE'
-    m=[1]*106
-    print(delete_rows_columns(sheet_id,134407002,1,2))
+    m=[1.6]*3
+    print(append_value_spreadsheets(sheet_id,'testing!A1:ZZ1',[m]))
