@@ -30,7 +30,7 @@ def Draw():
         price=client.continuous_klines(pair=PARA.symbol,contractType='PERPETUAL',interval=i,limit=1)[0][:6]
         price.extend(ema_val)
         
-        sheet.append_value_spreadsheets(sheet_id,'1m!A1:ZZ1',[price])
+        sheet.append_value_spreadsheets(PARA.sheet_id,'1m!A1:ZZ1',[price])
 
 
     print(updated_col)
