@@ -6,25 +6,6 @@ __location__=os.path.dirname(__file__)
 client=UMFutures(PARA.api_key,PARA.secret,base_url=PARA.base_url)
 
 #-----------Function
-def handle_ohlvc(raw):
-    #convert raw data crawled from binance to dataframe pandas for easy process
-
-    df=pd.DataFrame(raw,columns=['Timestamp','Open','High','Low','Close','Volume'])
-    df['Date']=df['Timestamp'].map(lambda x:dt.datetime.strftime(dt.datetime.fromtimestamp(x/1000),'%Y/%m/%d %H:%M:%S'))
-
-    return df
-
-def updated_columns():
-    #Return the columns that need to update at that time
-
-    now_min=int(dt.datetime.now().timestamp()/60)
-    updated_col=[]
-    for i in PARA.col:
-        if (now_min-PARA.standard_min)%PARA.tf_to_min[i]==0:
-            updated_col.append(i)
-    
-    return updated_col
-
 def Ema():
     #Calculate the Ema values
 
@@ -32,14 +13,14 @@ def Ema():
     index=['Date','Timestamp']
     index.extend([f'Ema_{i}' for i in range(1,101)])
     
-    update_col=updated_columns()
+    update_col=F.updated_columns()
     for i in update_col:
 
         price=[]
         date=[]
         timestamp=[]
     
-        get=handle_ohlvc([client.continuous_klines(pair=PARA.symbol,contractType='PERPETUAL',interval=i,limit=1)[0][:6]])
+        get=F.handle_ohlvc([client.continuous_klines(pair=PARA.symbol,contractType='PERPETUAL',interval=i,limit=1)[0][:6]])
         price.append(get[PARA.type].values[0])
         date.append(get['Date'].values[0])
         timestamp.append(int(get['Timestamp'].values[0]))

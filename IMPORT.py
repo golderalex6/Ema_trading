@@ -11,3 +11,4 @@ load_dotenv()
 from math import *
 import requests
 import PARAMETER as PARA
+import Functional as F

@@ -9,27 +9,6 @@ client.change_leverage(PARA.symbol,1)
 #-----------Function
 def round_down_nth(d,n):
     return floor(d*10**(n))/10**n
-def handle_ohlvc(raw):
-    #convert raw data crawled from binance to dataframe pandas for easy process
-
-    df=pd.DataFrame(raw,columns=['Timestamp','Open','High','Low','Close','Volume'])
-    df['Date']=df['Timestamp'].map(lambda x:dt.datetime.strftime(dt.datetime.fromtimestamp(x/1000),'%Y/%m/%d %H:%M:%S'))
-
-    return df
-
-def round_time(tf):
-    #wait to the nearest time frame
-
-    sec=PARA.tf_to_sec[tf]
-    standard_time=dt.datetime(2024,1,1,7,0).timestamp()
-    n=dt.datetime.now().timestamp()
-
-    if (int(n)-standard_time)%sec==0:
-        print(dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S'))
-        return
-    gap=ceil((n-standard_time)/sec)*sec-(n-standard_time)
-    sleep(gap)
-    print(dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S'))
 
 def cross_over(fast,slow):
     #check if the fast ema is cross over the slow one
