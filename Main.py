@@ -2,8 +2,11 @@ from IMPORT import *
 
 #-----------Normal setup
 __location__=os.path.dirname(__file__)
+'''
 client = UMFutures(PARA.api_key,PARA.secret,base_url=PARA.base_url)
 client.change_leverage(PARA.symbol,1)
+'''
+client = UMFutures() #delete this line and uncomment 2 line above to start trading
 #-----------Normal setup
 
 #-----------Function
