@@ -75,12 +75,12 @@ def main()->None:
 
                 print(now,'Buy')
                 if open_position:
-                    client.new_order(symbol=PARA.symbol,side='BUY',type='MARKET',quantity=latest_quant)
+                    #client.new_order(symbol=PARA.symbol,side='BUY',type='MARKET',quantity=latest_quant) #Remember to uncomment all the client.new_order statement to trading
                     close_price=float(order_books['asks'][0][0])
                     trading_log(now,'SELL',latest_quant,open_price,close_price)
 
                 quantity=round_down_nth(PARA.balance/float(order_books['asks'][0][0]),3)
-                client.new_order(symbol=PARA.symbol,side='BUY',type='MARKET',quantity=quantity)
+                #client.new_order(symbol=PARA.symbol,side='BUY',type='MARKET',quantity=quantity) #Remember to uncomment all the client.new_order statement to trading
                 open_position=True
                 latest_quant=quantity
                 open_price=float(order_books['asks'][0][0])
@@ -90,12 +90,15 @@ def main()->None:
 
                 print(now,'Sell')
                 if open_position:
-                    client.new_order(symbol=PARA.symbol,side='SELL',type='MARKET',quantity=latest_quant)
+                    #client.new_order(symbol=PARA.symbol,side='SELL',type='MARKET',quantity=latest_quant) #Remember to uncomment all the client.new_order statement to trading
+
+
+
                     close_price=float(order_books['bids'][0][0])
                     trading_log(now,'BUY',latest_quant,open_price,close_price)
 
                 quantity=round_down_nth(PARA.balance/float(order_books['bids'][0][0]),3)
-                client.new_order(symbol=PARA.symbol,side='SELL',type='MARKET',quantity=quantity)
+                #client.new_order(symbol=PARA.symbol,side='SELL',type='MARKET',quantity=quantity)) #Remember to uncomment all the client.new_order statement to trading
                 open_position=True
                 latest_quant=quantity
                 open_price=float(order_books['bids'][0][0])
