@@ -3,7 +3,12 @@ sys.path.append('/Working/Trading')
 from IMPORT import *
 
 __location__=os.path.dirname(__file__)
-client=UMFutures(PARA.api_key,PARA.secret,base_url=PARA.base_url)
+exchange_id = 'binance'
+exchange_class = getattr(ccxt, exchange_id)
+exchange = exchange_class({
+    'apiKey': PARA.api_key ,
+    'secret': PARA.secret ,
+})
 
 #-----------Function
 def Ema():
@@ -20,7 +25,7 @@ def Ema():
         date=[]
         timestamp=[]
     
-        get=F.handle_ohlvc([client.continuous_klines(pair=PARA.symbol,contractType='PERPETUAL',interval=i,limit=1)[0][:6]])
+        get=F.handle_ohlvc(exchange.fetch_ohlcv(PARA.symbol,i,limit=1))
         price.append(get[PARA.type].values[0])
         date.append(get['Date'].values[0])
         timestamp.append(int(get['Timestamp'].values[0]))

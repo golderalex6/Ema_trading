@@ -2,7 +2,12 @@ from IMPORT import *
 
 #-----------Normal setup
 __location__=os.path.dirname(__file__)
-client = UMFutures(base_url=PARA.base_url)
+exchange_id = 'binance'
+exchange_class = getattr(ccxt, exchange_id)
+exchange = exchange_class({
+    'apiKey': PARA.api_key ,
+    'secret': PARA.secret ,
+})
 ##-----------Normal setup
 
 #-----------Function
@@ -17,7 +22,7 @@ def Draw():
             sheet.delete_rows_columns(PARA.sheet_id,PARA.sheet_code[i],1,2)
         ema_val=list(pd.read_csv(os.path.join(__location__,f'Indicator/Ema_{i}.csv'),index_col=0)[i].values)
 
-        price=client.continuous_klines(pair=PARA.symbol,contractType='PERPETUAL',interval=i,limit=1)[0][1:6]
+        price=exchange.fetch_ohlcv(PARA.symbol,i,limit=1)[0]
         price.extend(ema_val)
         price=F.convert_number(price)
 

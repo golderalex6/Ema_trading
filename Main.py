@@ -2,11 +2,12 @@ from IMPORT import *
 
 #-----------Normal setup
 __location__=os.path.dirname(__file__)
-'''
-client = UMFutures(PARA.api_key,PARA.secret,base_url=PARA.base_url)
-client.change_leverage(PARA.symbol,1)
-'''
-client = UMFutures() #delete this line and uncomment 2 line above to start trading
+exchange_id = 'binance'
+exchange_class = getattr(ccxt, exchange_id)
+exchange = exchange_class({
+    'apiKey': PARA.api_key ,
+    'secret': PARA.secret ,
+})
 #-----------Normal setup
 
 #-----------Function
@@ -71,19 +72,19 @@ def main()->None:
             
             now=dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S')
                         
-            order_books=client.depth(PARA.symbol,limit=5)
+            order_books=exchange.fetch_order_book(PARA.symbol,limit=2)
 
             if cross_over(fast,slow):
                 #close the sell order and create a new buy order
 
                 print(now,'Buy')
                 if open_position:
-                    #client.new_order(symbol=PARA.symbol,side='BUY',type='MARKET',quantity=latest_quant) #Remember to uncomment all the client.new_order statement to trading
-                    close_price=float(order_books['asks'][0][0])
+                    #PLACE BUY ORDER HERE 
+                    close_price=float(order_books['asks'][0][0]) 
                     trading_log(now,'SELL',latest_quant,open_price,close_price)
 
                 quantity=round_down_nth(PARA.balance/float(order_books['asks'][0][0]),3)
-                #client.new_order(symbol=PARA.symbol,side='BUY',type='MARKET',quantity=quantity) #Remember to uncomment all the client.new_order statement to trading
+                #PLACE BUY ORDER HERE
                 open_position=True
                 latest_quant=quantity
                 open_price=float(order_books['asks'][0][0])
@@ -93,15 +94,12 @@ def main()->None:
 
                 print(now,'Sell')
                 if open_position:
-                    #client.new_order(symbol=PARA.symbol,side='SELL',type='MARKET',quantity=latest_quant) #Remember to uncomment all the client.new_order statement to trading
-
-
-
+                    #PLACE SELL ORDER HERE 
                     close_price=float(order_books['bids'][0][0])
                     trading_log(now,'BUY',latest_quant,open_price,close_price)
 
                 quantity=round_down_nth(PARA.balance/float(order_books['bids'][0][0]),3)
-                #client.new_order(symbol=PARA.symbol,side='SELL',type='MARKET',quantity=quantity)) #Remember to uncomment all the client.new_order statement to trading
+                #PLACE SELL ORDER HERE
                 open_position=True
                 latest_quant=quantity
                 open_price=float(order_books['bids'][0][0])
@@ -110,6 +108,5 @@ def main()->None:
         sleep(0.5)
         
 #-----------Function
-
 if __name__=='__main__':
     main()
