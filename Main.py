@@ -72,7 +72,7 @@ def main()->None:
             
             now=dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S')
                         
-            order_books=exchange.fetch_order_book(PARA.symbol,limit=2)
+            order_books=exchange.fetch_order_book(PARA.symbol,limit=5)
 
             if cross_over(fast,slow):
                 #close the sell order and create a new buy order
