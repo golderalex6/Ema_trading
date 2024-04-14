@@ -22,7 +22,7 @@ def Draw():
             sheet.delete_rows_columns(PARA.sheet_id,PARA.sheet_code[i],1,2)
         ema_val=list(pd.read_csv(os.path.join(__location__,f'Indicator/Ema_{i}.csv'),index_col=0)[i].values)
 
-        price=exchange.fetch_ohlcv(PARA.symbol,i,limit=1)[0]
+        price=exchange.fetch_ohlcv(PARA.symbol,i,limit=1)[0][1:]
         price.extend(ema_val)
         price=F.convert_number(price)
 
