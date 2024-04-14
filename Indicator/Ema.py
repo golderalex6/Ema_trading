@@ -24,8 +24,12 @@ def Ema():
         price=[]
         date=[]
         timestamp=[]
-    
-        get=F.handle_ohlvc(exchange.fetch_ohlcv(PARA.symbol,i,limit=1))
+        while True:
+            try:
+                get=F.handle_ohlvc(exchange.fetch_ohlcv(PARA.symbol,i,limit=1))
+                break
+            except:
+                sleep(0.5)
         price.append(get[PARA.type].values[0])
         date.append(get['Date'].values[0])
         timestamp.append(int(get['Timestamp'].values[0]))
@@ -53,6 +57,7 @@ def Ema():
             df=pd.DataFrame(data,columns=[i],index=index)
             df.to_csv(os.path.join(__location__,f'Ema_{i}.csv'))
 
+    print(dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S'))
     print('Updated timeframe :',update_col)
 
 def round_time():
@@ -63,8 +68,7 @@ def round_time():
 
     gap=ceil((n-PARA.standard_sec)/sec)*sec-(n-PARA.standard_sec)
     sleep(gap)
-    print(dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S'))
-
+    
 def Main():
     while True:
         round_time()

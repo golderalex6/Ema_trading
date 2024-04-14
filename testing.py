@@ -6,4 +6,6 @@ exchange = exchange_class({
     'secret': PARA.secret,
 })
 
-print(exchange.fetch_ohlcv(PARA.symbol,'1m',limit=2))
+print('a')
+sleep(1)
+print('b')
