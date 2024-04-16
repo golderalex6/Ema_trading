@@ -3,7 +3,6 @@ import requests
 import subprocess
 import pandas as pd
 import os
-from time import sleep
 
 def get_auth_url(scope):
     with open('Credential.json','r+') as f:
@@ -41,25 +40,15 @@ def regenerate_access_token():
     
     token=requests.post(url_access_token,headers={'Host':'oauth2.googleapis.com','Content-Type':'application/x-www-form-urlencoded'}).json()
 
-    credential['access_token']=token['access_token']
-    with open('Credential.json','w+') as f:
-        f.write(json.dumps(credential))
     return token['access_token']
 
 def read_value_spreadsheets(spreadsheet_id:str,ranges:str,majorDimension='ROWS'):
-    with open('Credential.json','r+') as f:
-        credential=json.loads(f.read())
-        access_token=credential['access_token']
     
-    if not check_expired(access_token):
-        access_token=regenerate_access_token()
+    access_token=regenerate_access_token()
     get=requests.get(f'https://sheets.googleapis.com/v4/spreadsheets/{spreadsheet_id}/values:batchGet?access_token={access_token}&ranges={ranges}&majorDimension={majorDimension}').json()
     return get['valueRanges'][0]['values']
     
 def write_value_spreadsheets(spreadsheet_id:str,ranges:str,values:list):
-    with open('Credential.json','r+') as f:
-        credential=json.loads(f.read())
-        access_token=credential['access_token']
     
     val={'range':ranges,'values':values}
     data={
@@ -67,39 +56,28 @@ def write_value_spreadsheets(spreadsheet_id:str,ranges:str,values:list):
             'data':val
     }
 
-    if not check_expired(access_token):
-        access_token=regenerate_access_token()
+    access_token=regenerate_access_token()
     change=requests.post(f'https://sheets.googleapis.com/v4/spreadsheets/{spreadsheet_id}/values:batchUpdate?access_token={access_token}',data=json.dumps(data)).text
     return change
 
 def clear_value_spreadsheets(spreadsheet_id:str,range:str):
-    with open('Credential.json','r+') as f:
-        credential=json.loads(f.read())
-        access_token=credential['access_token']
-
-    if not check_expired(access_token):
-        access_token=regenerate_access_token()
+    
+    access_token=regenerate_access_token()
 
     clear=requests.post(f'https://sheets.googleapis.com/v4/spreadsheets/{spreadsheet_id}/values/{range}:clear?access_token={access_token}').text
     return clear
 
 def append_value_spreadsheets(spreadsheet_id:str,range:str,values:list,insert_option='INSERT_ROWS'):
-    with open('Credential.json','r+') as f:
-        credential=json.loads(f.read())
-        access_token=credential['access_token']
+    
     val={'range':range,'values':values}
 
-    if not check_expired(access_token):
-        access_token=regenerate_access_token()
+    access_token=regenerate_access_token()
     
     append=requests.post(f'https://sheets.googleapis.com/v4/spreadsheets/{spreadsheet_id}/values/{range}:append?access_token={access_token}&valueInputOption=USER_ENTERED&insertDataOption={insert_option}',data=json.dumps(val)).text
     return append
 
 def delete_rows_columns(spreadsheet_id:str,sheet_code:int,fr:int,t:int,dimension='ROWS'):
-    with open('Credential.json','r+') as f:
-        credential=json.loads(f.read())
-        access_token=credential['access_token']
-
+    
     config={
       "deleteDimension": {
         "range": {
@@ -113,8 +91,7 @@ def delete_rows_columns(spreadsheet_id:str,sheet_code:int,fr:int,t:int,dimension
 
     val={"requests":[config]}
 
-    if not check_expired(access_token):
-        access_token=regenerate_access_token()
+    access_token=regenerate_access_token()
     m=requests.post(f'https://sheets.googleapis.com/v4/spreadsheets/{spreadsheet_id}:batchUpdate?access_token={access_token}',data=json.dumps(val))
     return m.json()
 if __name__ =='__main__':
