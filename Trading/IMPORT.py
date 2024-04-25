@@ -13,3 +13,7 @@ import PARAMETER as PARA
 import Functional as F
 import sqlite3 as sql
 import ERROR
+import sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).parents[1])+'/Database/')
+import DB_function as DB

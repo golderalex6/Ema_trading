@@ -1398,6 +1398,12 @@ Open real not null,
 Close real not null,
 [Win percent] real not null,
 [Win USDT] real not null);
+
+create table Open_order(
+[Order type] text not null,
+Amount real not null,
+[Open price] real not null
+)
 '''
 
 cursor.executescript(sql_str)

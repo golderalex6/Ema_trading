@@ -3,11 +3,6 @@ import sys
 sys.path.append(str(Path(__file__).parents[1]))
 from IMPORT import *
 from Indicator import Ema
-#-----------Database connection
-conn=sql.connect(os.path.join(str(Path(__file__).parents[2]),'Database/Main.db'))
-cursor=conn.cursor()
-#-----------Database connection
-
 #-----------Normal setup
 __location__=os.path.dirname(__file__)
 exchange_id = 'binance'
@@ -28,31 +23,28 @@ def round_time():
     gap=ceil((n-PARA.standard_sec)/sec)*sec-(n-PARA.standard_sec)
     sleep(gap)
 
-def insert_db(table,para,multi=False):
-    if multi:
-        for i in range(len(table)): 
-            p_len=','.join(['?']*len(para[i]))
-            cursor.execute(f'insert into {table[i]} values ({p_len})',para[i])
-    else:
-        p_len=','.joing(['?']*len(para))
-        cursor.execute(f"insert into {table} values ({p_len})",para)
-    conn.commit()
-        
+def get_and_compare_data():
+    #get the new data and make sure not get the duplicate data
+
+    while True:
+        cursor.execute(f'select Timestamp from Price_{i} order by Timestamp desc limit 1')
+        latest=cursor.fetchall()[0][0]
+        try:
+            get=F.handle_ohlvc([exchange.fetch_ohlcv(PARA.symbol,i,limit=2)[0]])
+            if latest==get['Timestamp'].values[0]:
+                raise
+            break
+        except:
+            sleep(0.5)
+    return get
+
+
 def calculate_and_distribute():
 
     update_col=F.updated_columns()
     for i in update_col: 
-        while True:
-            cursor.execute(f'select Timestamp from Price_{i} order by Timestamp desc limit 1')
-            latest=cursor.fetchall()[0][0]
-            try:
-                get=F.handle_ohlvc([exchange.fetch_ohlcv(PARA.symbol,i,limit=2)[0]])
-                if latest==get['Timestamp'].values[0]:
-                    raise
-                break
-            except:
-                sleep(0.5)
-        price=get.values[0]
+
+        price=get_and_compare_data()
         
         #Ema
         cursor.execute(f'select * from Ema_{i} order by Timestamp desc limit 1')
@@ -69,7 +61,8 @@ def calculate_and_distribute():
             print()
         except Exception as e:
             error_str=str(e)
-            ERROR.send_error(error_str)
+            # ERROR.send_error(error_str)
+            print(error_str )
             raise
         #Trading
         
