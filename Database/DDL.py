@@ -10,8 +10,7 @@ if os.path.exists(db_path):
 conn=sql.connect(os.path.join(__location__,'Main.db'))
 cursor=conn.cursor()
 
-sql_str='''
-create table Ema_1m(
+sql_str='''create table Ema_1m(
 Date text not null,
 Timestamp int primary key,
 Ema_1 real not null,
@@ -114,7 +113,7 @@ Ema_97 real not null,
 Ema_98 real not null,
 Ema_99 real not null,
 Ema_100 real not null 
-)
+);
 
 create table Ema_3m(
 Date text not null,
@@ -219,7 +218,7 @@ Ema_97 real not null,
 Ema_98 real not null,
 Ema_99 real not null,
 Ema_100 real not null 
-)
+);
 
 create table Ema_5m(
 Date text not null,
@@ -324,7 +323,7 @@ Ema_97 real not null,
 Ema_98 real not null,
 Ema_99 real not null,
 Ema_100 real not null 
-)
+);
 
 create table Ema_15m(
 Date text not null,
@@ -429,7 +428,7 @@ Ema_97 real not null,
 Ema_98 real not null,
 Ema_99 real not null,
 Ema_100 real not null 
-)
+);
 
 create table Ema_30m(
 Date text not null,
@@ -534,7 +533,7 @@ Ema_97 real not null,
 Ema_98 real not null,
 Ema_99 real not null,
 Ema_100 real not null 
-)
+);
 
 create table Ema_1h(
 Date text not null,
@@ -639,7 +638,7 @@ Ema_97 real not null,
 Ema_98 real not null,
 Ema_99 real not null,
 Ema_100 real not null 
-)
+);
 
 create table Ema_2h(
 Date text not null,
@@ -744,7 +743,7 @@ Ema_97 real not null,
 Ema_98 real not null,
 Ema_99 real not null,
 Ema_100 real not null 
-)
+);
 
 create table Ema_4h(
 Date text not null,
@@ -849,7 +848,7 @@ Ema_97 real not null,
 Ema_98 real not null,
 Ema_99 real not null,
 Ema_100 real not null 
-)
+);
 
 create table Ema_6h(
 Date text not null,
@@ -954,7 +953,7 @@ Ema_97 real not null,
 Ema_98 real not null,
 Ema_99 real not null,
 Ema_100 real not null 
-)
+);
 
 create table Ema_8h(
 Date text not null,
@@ -1059,7 +1058,7 @@ Ema_97 real not null,
 Ema_98 real not null,
 Ema_99 real not null,
 Ema_100 real not null 
-)
+);
 
 create table Ema_12h(
 Date text not null,
@@ -1164,7 +1163,7 @@ Ema_97 real not null,
 Ema_98 real not null,
 Ema_99 real not null,
 Ema_100 real not null 
-)
+);
 
 create table Ema_1d(
 Date text not null,
@@ -1269,15 +1268,127 @@ Ema_97 real not null,
 Ema_98 real not null,
 Ema_99 real not null,
 Ema_100 real not null 
-)
+);
 
-create table Price(
-Date text primary key,
+create table Price_1m (
+Timestamp int primary key,
 Open real not null,
 High real not null,
 Low real not null,
-Close real not null
-)
+Close real not null,
+Volume real not null,
+Date text not null
+);
+
+create table Price_3m (
+Timestamp int primary key,
+Open real not null,
+High real not null,
+Low real not null,
+Close real not null,
+Volume real not null,
+Date text not null
+);
+
+create table Price_5m (
+Timestamp int primary key,
+Open real not null,
+High real not null,
+Low real not null,
+Close real not null,
+Volume real not null,
+Date text not null
+);
+
+create table Price_15m (
+Timestamp int primary key,
+Open real not null,
+High real not null,
+Low real not null,
+Close real not null,
+Volume real not null,
+Date text not null
+);
+
+create table Price_30m (
+Timestamp int primary key,
+Open real not null,
+High real not null,
+Low real not null,
+Close real not null,
+Volume real not null,
+Date text not null
+);
+
+create table Price_1h (
+Timestamp int primary key,
+Open real not null,
+High real not null,
+Low real not null,
+Close real not null,
+Volume real not null,
+Date text not null
+);
+
+create table Price_2h (
+Timestamp int primary key,
+Open real not null,
+High real not null,
+Low real not null,
+Close real not null,
+Volume real not null,
+Date text not null
+);
+
+create table Price_4h (
+Timestamp int primary key,
+Open real not null,
+High real not null,
+Low real not null,
+Close real not null,
+Volume real not null,
+Date text not null
+);
+
+create table Price_6h (
+Timestamp int primary key,
+Open real not null,
+High real not null,
+Low real not null,
+Close real not null,
+Volume real not null,
+Date text not null
+);
+
+create table Price_8h (
+Timestamp int primary key,
+Open real not null,
+High real not null,
+Low real not null,
+Close real not null,
+Volume real not null,
+Date text not null
+);
+
+create table Price_12h (
+Timestamp int primary key,
+Open real not null,
+High real not null,
+Low real not null,
+Close real not null,
+Volume real not null,
+Date text not null
+);
+
+create table Price_1d (
+Timestamp int primary key,
+Open real not null,
+High real not null,
+Low real not null,
+Close real not null,
+Volume real not null,
+Date text not null
+);
 
 create table History(
 Date text primary key,
@@ -1285,11 +1396,9 @@ Date text primary key,
 Amount real not null,
 Open real not null,
 Close real not null,
-[Win %] real not null,
-[Win USDT] real not null
-)
+[Win percent] real not null,
+[Win USDT] real not null);
 '''
-
 
 cursor.executescript(sql_str)
 conn.commit()

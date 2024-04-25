@@ -42,71 +42,57 @@ def trading_log(date:str,order_type:str,amount:float,open:float,close:float):
 
     win_usd=amount*win_per-total_fee
     history_log=[date,order_type,total_fee,amount,open,close,win_per,win_usd]
-    history_log=F.convert_number(history_log)
 
-    sheet.append_value_spreadsheets(PARA.sheet_id,'Trading_log!A1:H1',[history_log])
+def main(old_ema,new_ema,timeframe)->None:
+    #check if the timeframe passed is valid
+    if timeframe!=PARA.timeframe:
+        return
 
-def main()->None:
     #run the trading application
-    check=pd.read_csv(os.path.join(__location__,f'Indicator/Ema_{PARA.timeframe}.csv'),index_col=0)
-    
     open_position=False
     latest_quant=None
     open_price=None
     close_price=None
     
-    while True:
-        while True:
-            try:
-                new=pd.read_csv(os.path.join(__location__,f'Indicator/Ema_{PARA.timeframe}.csv'),index_col=0)
-                break
-            except:
-                sleep(0.5)
+    #Get the Ema value
+    fast_old,slow_old=check.loc[[f'Ema_{PARA.ema_fast}',f'Ema_{PARA.ema_slow}']].values
+    fast_new,slow_new=new.loc[[f'Ema_{PARA.ema_fast}',f'Ema_{PARA.ema_slow}']].values
+    fast,slow=[fast_old,fast_new],[slow_old,slow_new]
+    
+    now=dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S')
+                
+    order_books=exchange.fetch_order_book(PARA.symbol,limit=5)
 
-        if not check.equals(new):
-            
-            #Get the Ema value
-            fast_old,slow_old=check.loc[[f'Ema_{PARA.ema_fast}',f'Ema_{PARA.ema_slow}']].values
-            fast_new,slow_new=new.loc[[f'Ema_{PARA.ema_fast}',f'Ema_{PARA.ema_slow}']].values
-            fast,slow=[fast_old,fast_new],[slow_old,slow_new]
-            
-            now=dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S')
-                        
-            order_books=exchange.fetch_order_book(PARA.symbol,limit=5)
+    if cross_over(fast,slow):
+        #close the sell order and create a new buy order
 
-            if cross_over(fast,slow):
-                #close the sell order and create a new buy order
+        print(now,'Buy')
+        if open_position:
+            #PLACE BUY ORDER HERE 
+            close_price=float(order_books['asks'][0][0]) 
+            trading_log(now,'SELL',latest_quant,open_price,close_price)
 
-                print(now,'Buy')
-                if open_position:
-                    #PLACE BUY ORDER HERE 
-                    close_price=float(order_books['asks'][0][0]) 
-                    trading_log(now,'SELL',latest_quant,open_price,close_price)
+        quantity=round_down_nth(PARA.balance/float(order_books['asks'][0][0]),3)
+        #PLACE BUY ORDER HERE
+        open_position=True
+        latest_quant=quantity
+        open_price=float(order_books['asks'][0][0])
 
-                quantity=round_down_nth(PARA.balance/float(order_books['asks'][0][0]),3)
-                #PLACE BUY ORDER HERE
-                open_position=True
-                latest_quant=quantity
-                open_price=float(order_books['asks'][0][0])
+    if cross_under(fast,slow):
+        #close the buy order and create a new sell order
 
-            if cross_under(fast,slow):
-                #close the buy order and create a new sell order
+        print(now,'Sell')
+        if open_position:
+            #PLACE SELL ORDER HERE 
+            close_price=float(order_books['bids'][0][0])
+            trading_log(now,'BUY',latest_quant,open_price,close_price)
 
-                print(now,'Sell')
-                if open_position:
-                    #PLACE SELL ORDER HERE 
-                    close_price=float(order_books['bids'][0][0])
-                    trading_log(now,'BUY',latest_quant,open_price,close_price)
-
-                quantity=round_down_nth(PARA.balance/float(order_books['bids'][0][0]),3)
-                #PLACE SELL ORDER HERE
-                open_position=True
-                latest_quant=quantity
-                open_price=float(order_books['bids'][0][0])
-
-            check=new
-        sleep(0.5)
-        
+        quantity=round_down_nth(PARA.balance/float(order_books['bids'][0][0]),3)
+        #PLACE SELL ORDER HERE
+        open_position=True
+        latest_quant=quantity
+        open_price=float(order_books['bids'][0][0])
+    
 #-----------Function
 if __name__=='__main__':
     main()

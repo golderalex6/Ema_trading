@@ -5,7 +5,6 @@ def handle_ohlvc(raw):
 
     df=pd.DataFrame(raw,columns=['Timestamp','Open','High','Low','Close','Volume'])
     df['Date']=df['Timestamp'].map(lambda x:dt.datetime.strftime(dt.datetime.fromtimestamp(x/1000),'%Y/%m/%d %H:%M:%S'))
-
     return df
 
 def updated_columns():
