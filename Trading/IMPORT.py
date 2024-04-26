@@ -10,10 +10,11 @@ load_dotenv()
 from math import *
 import requests
 import PARAMETER as PARA
-import Functional as F
+import FUNCTIONAL as F
 import sqlite3 as sql
 import ERROR
 import sys
+from INDICATOR import Ema
 from pathlib import Path
 sys.path.append(str(Path(__file__).parents[1])+'/Database/')
-import DB_function as DB
+import DB_FUNCTION as DB

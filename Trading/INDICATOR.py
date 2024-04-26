@@ -1,6 +1,3 @@
-from pathlib import Path
-import sys
-sys.path.append(str(Path(__file__).parents[1]))
 from IMPORT import *
 
 #-----------Function

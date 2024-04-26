@@ -5,6 +5,7 @@ col=['1m','3m','5m','15m','30m','1h','2h','4h','6h','8h','12h','1d']
 
 u=''
 
+#for Ema
 # for i in col:
 #     u+=f'create table Ema_{i}(\n'
 #     u+='Date text not null,\n'
@@ -16,6 +17,7 @@ u=''
 #             u+=f'Ema_{v} real not null,\n'
 #     u+=');\n\n'
 
+#for Price
 # for i in col:
 #     u+=f'''
 # create table Price_{i} (
@@ -28,6 +30,9 @@ u=''
 # Date text not null
 # );
 # '''
-u+=f"insert into Ema_ values {','.join(['?' for i in range(102)])}"
+
+#for trigger
+
+
 with open(os.path.join(__location__,'raw.txt'),'w+') as f:
     f.write(u)
