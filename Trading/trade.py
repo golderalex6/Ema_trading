@@ -46,9 +46,9 @@ def Trade()->None:
     old_ema=DB.query_db(f'select * from Ema_{tf} order by Timestamp desc limit 1')
     while True:
         new_ema=DB.query_db(f'select * from Ema_{tf} order by Timestamp desc limit 1')
-        if old_ema!=new_ema:
-            fast_old,slow_old=old_ema[PARA.ema_fast+1],old_ema[PARA.ema_slow+1]
-            fast_new,slow_new=new_ema[PARA.ema_fast+1],new_ema[PARA.ema_slow+1]
+        if old_ema!=new_ema and len(old_ema)>0:
+            fast_old,slow_old=old_ema[0][PARA.ema_fast+1],old_ema[0][PARA.ema_slow+1]
+            fast_new,slow_new=new_ema[0][PARA.ema_fast+1],new_ema[0][PARA.ema_slow+1]
             fast,slow=[fast_old,fast_new],[slow_old,slow_new]
             
             now=dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S')
@@ -95,7 +95,7 @@ def Main():
     try:
         Trade()
     except Exception as e:
-        error_str='Error from trade.py '+e
+        error_str='Error from trade.py '+str(e)
         ERROR.send_error(error_str)
         raise
 #-----------Function

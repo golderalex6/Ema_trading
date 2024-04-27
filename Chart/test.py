@@ -4,9 +4,9 @@ import plotext as plt
 import random
 import pandas as pd
 import datetime as dt
-
+import numpy as np
 df=pd.read_csv('Chart/BTCUSDC-5m-2024-04-01.csv',index_col=0).iloc[:,:4]
-bot,distance=0,50
+bot,distance=0,70
 df.columns=['Open','High','Low','Close']
 
 def convert(timestamp:int):
@@ -18,8 +18,11 @@ date=list(map(lambda x:convert(x),df.index))
 while True:
     dat=df.iloc[bot:bot+distance].to_dict(orient='list')
     day=date[bot:bot+distance]
-    plt.candlestick(day,dat)
+    # plt.candlestick(day,dat)
+    plt.plot(day,[500*np.sin(i)+20000 for i in range(len(day))],color='orange')
     plt.theme('matrix')
+    plt.grid(True,True)
+    plt.title('5m')
     plt.show()
     bot+=1
     sleep(2)
