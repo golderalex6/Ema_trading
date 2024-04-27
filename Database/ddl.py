@@ -7,10 +7,12 @@ db_path=os.path.join(__location__,'Main.db')
 if os.path.exists(db_path):
     os.remove(db_path)
 
-conn=sql.connect(os.path.join(__location__,'Main.db'))
+conn=sql.connect(db_path)
 cursor=conn.cursor()
 
-sql_str='''create table Ema_1m(
+sql_str='''
+/*Ema_table*/
+create table Ema_1m(
 Date text not null,
 Timestamp int primary key,
 Ema_1 real not null,
@@ -1270,6 +1272,8 @@ Ema_99 real not null,
 Ema_100 real not null 
 );
 
+/*Price_table*/
+
 create table Price_1m (
 Timestamp int primary key,
 Open real not null,
@@ -1390,11 +1394,12 @@ Volume real not null,
 Date text not null
 );
 
+/*Ema_trigger*/
 create trigger check_len_Ema_1m
 before insert 
 on Ema_1m
 begin
-    delete from Ema_1m where Timestamp in (select Timestamp from Ema_1m order by Timestamp limit 1) and (select count(*) from Timestamp)>=70;
+    delete from Ema_1m where Timestamp in (select Timestamp from Ema_1m order by Timestamp limit 1) and (select count(*) from Ema_1m)>=70;
 end;
 
 
@@ -1402,7 +1407,7 @@ create trigger check_len_Ema_3m
 before insert 
 on Ema_3m
 begin
-    delete from Ema_3m where Timestamp in (select Timestamp from Ema_3m order by Timestamp limit 1) and (select count(*) from Timestamp)>=70;
+    delete from Ema_3m where Timestamp in (select Timestamp from Ema_3m order by Timestamp limit 1) and (select count(*) from Ema_3m)>=70;
 end;
 
 
@@ -1410,7 +1415,7 @@ create trigger check_len_Ema_5m
 before insert 
 on Ema_5m
 begin
-    delete from Ema_5m where Timestamp in (select Timestamp from Ema_5m order by Timestamp limit 1) and (select count(*) from Timestamp)>=70;
+    delete from Ema_5m where Timestamp in (select Timestamp from Ema_5m order by Timestamp limit 1) and (select count(*) from Ema_5m)>=70;
 end;
 
 
@@ -1418,7 +1423,7 @@ create trigger check_len_Ema_15m
 before insert 
 on Ema_15m
 begin
-    delete from Ema_15m where Timestamp in (select Timestamp from Ema_15m order by Timestamp limit 1) and (select count(*) from Timestamp)>=70;
+    delete from Ema_15m where Timestamp in (select Timestamp from Ema_15m order by Timestamp limit 1) and (select count(*) from Ema_15m)>=70;
 end;
 
 
@@ -1426,7 +1431,7 @@ create trigger check_len_Ema_30m
 before insert 
 on Ema_30m
 begin
-    delete from Ema_30m where Timestamp in (select Timestamp from Ema_30m order by Timestamp limit 1) and (select count(*) from Timestamp)>=70;
+    delete from Ema_30m where Timestamp in (select Timestamp from Ema_30m order by Timestamp limit 1) and (select count(*) from Ema_30m)>=70;
 end;
 
 
@@ -1434,7 +1439,7 @@ create trigger check_len_Ema_1h
 before insert 
 on Ema_1h
 begin
-    delete from Ema_1h where Timestamp in (select Timestamp from Ema_1h order by Timestamp limit 1) and (select count(*) from Timestamp)>=70;
+    delete from Ema_1h where Timestamp in (select Timestamp from Ema_1h order by Timestamp limit 1) and (select count(*) from Ema_1h)>=70;
 end;
 
 
@@ -1442,7 +1447,7 @@ create trigger check_len_Ema_2h
 before insert 
 on Ema_2h
 begin
-    delete from Ema_2h where Timestamp in (select Timestamp from Ema_2h order by Timestamp limit 1) and (select count(*) from Timestamp)>=70;
+    delete from Ema_2h where Timestamp in (select Timestamp from Ema_2h order by Timestamp limit 1) and (select count(*) from Ema_2h)>=70;
 end;
 
 
@@ -1450,7 +1455,7 @@ create trigger check_len_Ema_4h
 before insert 
 on Ema_4h
 begin
-    delete from Ema_4h where Timestamp in (select Timestamp from Ema_4h order by Timestamp limit 1) and (select count(*) from Timestamp)>=70;
+    delete from Ema_4h where Timestamp in (select Timestamp from Ema_4h order by Timestamp limit 1) and (select count(*) from Ema_4h)>=70;
 end;
 
 
@@ -1458,7 +1463,7 @@ create trigger check_len_Ema_6h
 before insert 
 on Ema_6h
 begin
-    delete from Ema_6h where Timestamp in (select Timestamp from Ema_6h order by Timestamp limit 1) and (select count(*) from Timestamp)>=70;
+    delete from Ema_6h where Timestamp in (select Timestamp from Ema_6h order by Timestamp limit 1) and (select count(*) from Ema_6h)>=70;
 end;
 
 
@@ -1466,7 +1471,7 @@ create trigger check_len_Ema_8h
 before insert 
 on Ema_8h
 begin
-    delete from Ema_8h where Timestamp in (select Timestamp from Ema_8h order by Timestamp limit 1) and (select count(*) from Timestamp)>=70;
+    delete from Ema_8h where Timestamp in (select Timestamp from Ema_8h order by Timestamp limit 1) and (select count(*) from Ema_8h)>=70;
 end;
 
 
@@ -1474,7 +1479,7 @@ create trigger check_len_Ema_12h
 before insert 
 on Ema_12h
 begin
-    delete from Ema_12h where Timestamp in (select Timestamp from Ema_12h order by Timestamp limit 1) and (select count(*) from Timestamp)>=70;
+    delete from Ema_12h where Timestamp in (select Timestamp from Ema_12h order by Timestamp limit 1) and (select count(*) from Ema_12h)>=70;
 end;
 
 
@@ -1482,15 +1487,15 @@ create trigger check_len_Ema_1d
 before insert 
 on Ema_1d
 begin
-    delete from Ema_1d where Timestamp in (select Timestamp from Ema_1d order by Timestamp limit 1) and (select count(*) from Timestamp)>=70;
+    delete from Ema_1d where Timestamp in (select Timestamp from Ema_1d order by Timestamp limit 1) and (select count(*) from Ema_1d)>=70;
 end;
 
-
+/*Price_trigger*/
 create trigger check_len_Price_1m
 before insert 
 on Price_1m
 begin
-    delete from Price_1m where Timestamp in (select Timestamp from Price_1m order by Timestamp limit 1) and (select count(*) from Timestamp)>=70;
+    delete from Price_1m where Timestamp in (select Timestamp from Price_1m order by Timestamp limit 1) and (select count(*) from Price_1m)>=70;
 end;
 
 
@@ -1498,7 +1503,7 @@ create trigger check_len_Price_3m
 before insert 
 on Price_3m
 begin
-    delete from Price_3m where Timestamp in (select Timestamp from Price_3m order by Timestamp limit 1) and (select count(*) from Timestamp)>=70;
+    delete from Price_3m where Timestamp in (select Timestamp from Price_3m order by Timestamp limit 1) and (select count(*) from Price_3m)>=70;
 end;
 
 
@@ -1506,7 +1511,7 @@ create trigger check_len_Price_5m
 before insert 
 on Price_5m
 begin
-    delete from Price_5m where Timestamp in (select Timestamp from Price_5m order by Timestamp limit 1) and (select count(*) from Timestamp)>=70;
+    delete from Price_5m where Timestamp in (select Timestamp from Price_5m order by Timestamp limit 1) and (select count(*) from Price_5m)>=70;
 end;
 
 
@@ -1514,7 +1519,7 @@ create trigger check_len_Price_15m
 before insert 
 on Price_15m
 begin
-    delete from Price_15m where Timestamp in (select Timestamp from Price_15m order by Timestamp limit 1) and (select count(*) from Timestamp)>=70;
+    delete from Price_15m where Timestamp in (select Timestamp from Price_15m order by Timestamp limit 1) and (select count(*) from Price_15m)>=70;
 end;
 
 
@@ -1522,7 +1527,7 @@ create trigger check_len_Price_30m
 before insert 
 on Price_30m
 begin
-    delete from Price_30m where Timestamp in (select Timestamp from Price_30m order by Timestamp limit 1) and (select count(*) from Timestamp)>=70;
+    delete from Price_30m where Timestamp in (select Timestamp from Price_30m order by Timestamp limit 1) and (select count(*) from Price_30m)>=70;
 end;
 
 
@@ -1530,7 +1535,7 @@ create trigger check_len_Price_1h
 before insert 
 on Price_1h
 begin
-    delete from Price_1h where Timestamp in (select Timestamp from Price_1h order by Timestamp limit 1) and (select count(*) from Timestamp)>=70;
+    delete from Price_1h where Timestamp in (select Timestamp from Price_1h order by Timestamp limit 1) and (select count(*) from Price_1h)>=70;
 end;
 
 
@@ -1538,7 +1543,7 @@ create trigger check_len_Price_2h
 before insert 
 on Price_2h
 begin
-    delete from Price_2h where Timestamp in (select Timestamp from Price_2h order by Timestamp limit 1) and (select count(*) from Timestamp)>=70;
+    delete from Price_2h where Timestamp in (select Timestamp from Price_2h order by Timestamp limit 1) and (select count(*) from Price_2h)>=70;
 end;
 
 
@@ -1546,7 +1551,7 @@ create trigger check_len_Price_4h
 before insert 
 on Price_4h
 begin
-    delete from Price_4h where Timestamp in (select Timestamp from Price_4h order by Timestamp limit 1) and (select count(*) from Timestamp)>=70;
+    delete from Price_4h where Timestamp in (select Timestamp from Price_4h order by Timestamp limit 1) and (select count(*) from Price_4h)>=70;
 end;
 
 
@@ -1554,7 +1559,7 @@ create trigger check_len_Price_6h
 before insert 
 on Price_6h
 begin
-    delete from Price_6h where Timestamp in (select Timestamp from Price_6h order by Timestamp limit 1) and (select count(*) from Timestamp)>=70;
+    delete from Price_6h where Timestamp in (select Timestamp from Price_6h order by Timestamp limit 1) and (select count(*) from Price_6h)>=70;
 end;
 
 
@@ -1562,7 +1567,7 @@ create trigger check_len_Price_8h
 before insert 
 on Price_8h
 begin
-    delete from Price_8h where Timestamp in (select Timestamp from Price_8h order by Timestamp limit 1) and (select count(*) from Timestamp)>=70;
+    delete from Price_8h where Timestamp in (select Timestamp from Price_8h order by Timestamp limit 1) and (select count(*) from Price_8h)>=70;
 end;
 
 
@@ -1570,7 +1575,7 @@ create trigger check_len_Price_12h
 before insert 
 on Price_12h
 begin
-    delete from Price_12h where Timestamp in (select Timestamp from Price_12h order by Timestamp limit 1) and (select count(*) from Timestamp)>=70;
+    delete from Price_12h where Timestamp in (select Timestamp from Price_12h order by Timestamp limit 1) and (select count(*) from Price_12h)>=70;
 end;
 
 
@@ -1578,9 +1583,10 @@ create trigger check_len_Price_1d
 before insert 
 on Price_1d
 begin
-    delete from Price_1d where Timestamp in (select Timestamp from Price_1d order by Timestamp limit 1) and (select count(*) from Timestamp)>=70;
+    delete from Price_1d where Timestamp in (select Timestamp from Price_1d order by Timestamp limit 1) and (select count(*) from Price_1d)>=70;
 end;
 
+/*History_table*/
 create table History(
 Date text primary key,
 [Order type] text not null,
@@ -1590,6 +1596,7 @@ Close real not null,
 [Win percent] real not null,
 [Win USDT] real not null);
 
+/*Open_order*/
 create table Open_order(
 [Order type] text not null,
 Amount real not null,

@@ -31,27 +31,27 @@ u=''
 # );
 # '''
 
-# for trigger Ema
-#for i in col:
-#    u+=f'''
-#create trigger check_len_Ema_{i}
-#before insert 
-#on Ema_{i}
-#begin
-#    delete from Ema_{i} where Timestamp in (select Timestamp from Ema_{i} order by Timestamp limit 1) and (select count(*) from Timestamp)>=70;
-#end;\n
-#'''
+#for trigger Ema
+# for i in col:
+#     u+=f'''
+# create trigger check_len_Ema_{i}
+# before insert 
+# on Ema_{i}
+# begin
+#     delete from Ema_{i} where Timestamp in (select Timestamp from Ema_{i} order by Timestamp limit 1) and (select count(*) from Ema_{i})>=70;
+# end;\n
+# '''
 
-#for trigger Price
-#for i in col:
-#    u+=f'''
-#create trigger check_len_Price_{i}
-#before insert 
-#on Price_{i}
-#begin
-#    delete from Price_{i} where Timestamp in (select Timestamp from Price_{i} order by Timestamp limit 1) and (select count(*) from Timestamp)>=70;
-#end;\n
-#'''
+# # for trigger Price
+# for i in col:
+#     u+=f'''
+# create trigger check_len_Price_{i}
+# before insert 
+# on Price_{i}
+# begin
+#     delete from Price_{i} where Timestamp in (select Timestamp from Price_{i} order by Timestamp limit 1) and (select count(*) from Price_{i})>=70;
+# end;\n
+# '''
 
 
 with open(os.path.join(__location__,'RAW.txt'),'w+') as f:

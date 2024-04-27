@@ -9,7 +9,6 @@ def insert_db(table,para,multi=False):
     if multi:
         for i in range(len(table)): 
             p_len=','.join(['?']*len(para[i]))
-            print(f'insert into {table[i]} values ({p_len})')
             cursor.execute(f'insert into {table[i]} values ({p_len})',para[i])
     else:
         p_len=','.join(['?']*len(para))
@@ -24,3 +23,6 @@ def query_db(query_str):
 def delete_db(table,condition):
     cursor.execute(f'delete from {table} where {condition}')
     conn.commit()
+
+if __name__=='__main__':
+    print(query_db('select * from Open_order'))

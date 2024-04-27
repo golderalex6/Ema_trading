@@ -52,8 +52,10 @@ def Trade()->None:
             fast,slow=[fast_old,fast_new],[slow_old,slow_new]
             
             now=dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S')
-            order_books=exchange.fetch_order_book(PARA.symbol,limit=5)
             open_order=DB.query_db('select * from Open_order')
+            #reduce number of requests created
+            if cross_over(fast,slow) or cross_under(fast,slow):
+                order_books=exchange.fetch_order_book(PARA.symbol,limit=5)
 
             if cross_over(fast,slow):
                 #close the sell order and create a new buy order

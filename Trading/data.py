@@ -24,7 +24,7 @@ def get_and_compare_data(tf):
     while True:
         latest=DB.query_db(f'select Timestamp from Price_{tf} order by Timestamp desc limit 1')
         try:
-            get=F.handle_ohlvc([exchange.fetch_ohlcv(PARA.symbol,tf,limit=2)[0]])
+            get=F.handle_ohlvc([exchange.fetch_ohlcv(PARA.symbol,tf,limit=1)[0]])
             if len(latest)!=0:
                 if latest[0][0]==get['Timestamp'].values[0]:raise
             break
