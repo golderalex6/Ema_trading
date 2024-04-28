@@ -5,7 +5,7 @@ conn=sql.connect(os.path.join(__location__,'Main.db'))
 cursor=conn.cursor()
 
 sql_str='''
-select * from sqlite_master where type='table'
+select * from Open_order 
 '''
 
 cursor.execute(sql_str)

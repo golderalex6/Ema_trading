@@ -13,27 +13,13 @@ exchange = exchange_class({
 def round_down_nth(d,n):
     return floor(d*10**(n))/10**n
 
-def cross_over(fast,slow):
-    #check if the fast ema is cross over the slow one
-
-    if fast[0]<=slow[0] and fast[1]>slow[1]:
-        return True
-    return False
-
-def cross_under(fast,slow):
-    #check if the fast ema is cross under the slow one
-
-    if fast[0]>=slow[0] and fast[1]<slow[1]:
-        return True
-    return False
-
 def trading_log(date:str,order_type:str,amount:float,open:float,close:float):
     #write trading history for future query
     
     fee=0.002
     total_fee=fee*(amount+amount*close/open)
 
-    win_per=abs(close-open)/open
+    win_per=(-1,1)[order_type=='SELL']*(open-close)/open
     win_usd=amount*win_per-total_fee
     history_log=[date,order_type,total_fee,amount,open,close,win_per,win_usd]
     DB.insert_db('History',history_log)
@@ -54,15 +40,16 @@ def Trade()->None:
             now=dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S')
             open_order=DB.query_db('select * from Open_order')
             #reduce number of requests created
-            if cross_over(fast,slow) or cross_under(fast,slow):
+            if F.cross_over(fast,slow) or F.cross_under(fast,slow):
                 order_books=exchange.fetch_order_book(PARA.symbol,limit=5)
 
-            if cross_over(fast,slow):
+            if F.cross_over(fast,slow):
                 #close the sell order and create a new buy order
 
                 print(now,'Buy')
                 if open_order:
-                    latest_quant=open_order[1]
+                    latest_quant=open_order[0][1]
+                    open_price=open_order[0][2]
                     #PLACE MARKET BUY ORDER WITH QUANTITY ABOVE 
                     DB.delete_db('Open_order',"[Order type]='SELL'")
                     close_price=float(order_books['asks'][0][0]) 
@@ -73,12 +60,13 @@ def Trade()->None:
                 open_price=float(order_books['asks'][0][0])
                 DB.insert_db('Open_order',['BUY',quantity,open_price])
 
-            if cross_under(fast,slow):
+            if F.cross_under(fast,slow):
                 #close the buy order and create a new sell order
 
                 print(now,'Sell')
                 if open_order:
-                    latest_quant=open_order[1]
+                    latest_quant=open_order[0][1]
+                    open_price=open_order[0][2]
                     #PLACE MARKET SELL ORDER WITH QUANTITY ABOVE 
                     DB.delete_db('Open_order',"[Order type]='BUY'") 
                     close_price=float(order_books['bids'][0][0])

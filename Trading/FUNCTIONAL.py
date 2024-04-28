@@ -20,3 +20,19 @@ def updated_columns():
 
 def convert_number(data:list):
     return list(map(lambda x:str(x).replace('.',','),data))
+
+def cross_over(fast,slow):
+    #check if the fast ema is cross over the slow one
+
+    if fast[0]<=slow[0] and fast[1]>slow[1]:
+        return True
+    return False
+
+def cross_under(fast,slow):
+    #check if the fast ema is cross under the slow one
+
+    if fast[0]>=slow[0] and fast[1]<slow[1]:
+        return True
+    return False
+
+

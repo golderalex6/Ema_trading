@@ -22,9 +22,18 @@ def Draw(tf):
         ema_fast=list(map(lambda x:x[0],ema_fast))
         ema_slow=list(map(lambda x:x[0],ema_slow))
         day=list(map(lambda x:x[-1],price))
+        #Draw B/S order
+        for i in range(len(ema_fast)-2):
+            fast=ema_fast[i:i+2]
+            slow=ema_slow[i:i+2]
+            if F.cross_over(fast,slow):
+                plt.text('B',x=day[i+2],y=price[i+2][1],alignment='center',background='black',color='green')
+            if F.cross_under(fast,slow):
+                plt.text('S',x=day[i+2],y=price[i+2][1],alignment='center',background='black',color='red')
+
         candle=pd.DataFrame(list(map(lambda x:x[1:-2],price)),columns=['Open','High','Low','Close']).to_dict(orient='list')
-        plt.plot(day,ema_fast,color='orange',marker='fhd')
-        plt.plot(day,ema_slow,color='purple',marker='fhd')
+        plt.plot(day,ema_fast,color='orange',marker='fhd',label=f'Ema:{PARA.ema_fast}')
+        plt.plot(day,ema_slow,color='purple',marker='fhd',label=f'Ema:{PARA.ema_slow}')
         plt.candlestick(day,candle )
         plt.theme('matrix')
         plt.title(tf)
@@ -32,7 +41,6 @@ def Draw(tf):
 
         round_time()
         plt.clear_figure()
-
 def Main():
     tf=input('Please select your timeframe:')
     while tf not in PARA.col:
