@@ -44,13 +44,11 @@ def calculate_and_distribute():
         old_ema=[price[4]]*100 if len(old_ema)==0 else old_ema[0][2:]
         
         new_ema=Ema(price[4],old_ema,price[0],price[-1])
-        # print(price)
-        #Database
-        # DB.insert_db([f'Price_{i}',f'Ema_{i}'],[price,new_ema],True)
+        Database
+        DB.insert_db([f'Price_{i}',f'Ema_{i}'],[price,new_ema],True)
 
-    # print(dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S'))
-    # print('Updated timeframe :',update_col)
-    print('.'*100)
+    print(dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S'))
+    print('Updated timeframe :',update_col)
 
 def Main():
     #Error handling
