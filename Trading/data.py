@@ -40,11 +40,9 @@ def calculate_and_distribute():
         price=get_and_compare_data(i)
         #Ema
         old_ema=DB.query_db(f'select * from Ema_{i} order by Timestamp desc limit 1')
-        print(old_ema[0][:7],price)
         old_ema=[price[4]]*100 if len(old_ema)==0 else old_ema[0][2:]
-        
         new_ema=Ema(price[4],old_ema,price[0],price[-1])
-        Database
+        #Database
         DB.insert_db([f'Price_{i}',f'Ema_{i}'],[price,new_ema],True)
 
     print(dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S'))
