@@ -9,6 +9,10 @@ exchange = exchange_class({
 #-----------Normal setup
 
 #-----------Function
+def filling_data():
+    #filling the missing data
+    latest=DB.query_db(f'select Timestamp from Ema_1m order by Timestamp desc limit 1')
+
 def round_time():
     #wait to the nearest time frame
 
