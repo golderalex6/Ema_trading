@@ -20,11 +20,10 @@ def round_time():
 
 def get_and_compare_data(tf):
     #get the new data and make sure not get the duplicate data
-
+    latest=DB.query_db(f'select Timestamp from Price_{tf} order by Timestamp desc limit 1')
     while True:
-        latest=DB.query_db(f'select Timestamp from Price_{tf} order by Timestamp desc limit 1')
         try:
-            get=F.handle_ohlvc([exchange.fetch_ohlcv(PARA.symbol,tf,limit=1)[0]])
+            get=F.handle_ohlvc([exchange.fetch_ohlcv(PARA.symbol,tf,limit=2)[0]])
             if len(latest)!=0:
                 if latest[0][0]==get['Timestamp'].values[0]:raise
             break
@@ -40,15 +39,18 @@ def calculate_and_distribute():
 
         price=get_and_compare_data(i)
         #Ema
-        old_ema=DB.query_db(f'select * from Ema_{i} order by Timestamp limit 1')
+        old_ema=DB.query_db(f'select * from Ema_{i} order by Timestamp desc limit 1')
+        print(old_ema[0][:7],price)
         old_ema=[price[4]]*100 if len(old_ema)==0 else old_ema[0][2:]
-        new_ema=Ema(price[4],old_ema,price[0],price[-1])
         
+        new_ema=Ema(price[4],old_ema,price[0],price[-1])
+        # print(price)
         #Database
-        DB.insert_db([f'Price_{i}',f'Ema_{i}'],[price,new_ema],True)
+        # DB.insert_db([f'Price_{i}',f'Ema_{i}'],[price,new_ema],True)
 
-    print(dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S'))
-    print('Updated timeframe :',update_col)
+    # print(dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S'))
+    # print('Updated timeframe :',update_col)
+    print('.'*100)
 
 def Main():
     #Error handling

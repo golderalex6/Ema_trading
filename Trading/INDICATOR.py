@@ -15,4 +15,10 @@ def Ema(price:float,old_ema:list,timestamp,date):
 #-----------Function
 
 if __name__=="__main__":
-    Ema()
+    old_ema=[]
+    old_ema.extend([0]*49)
+    old_ema.append(63636.607)
+    old_ema.extend([0]*50)
+    price=63257.43
+    m=Ema(price,old_ema,0,0)
+    print(m[51])
