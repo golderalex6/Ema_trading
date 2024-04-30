@@ -19,3 +19,4 @@ from INDICATOR import Ema
 from pathlib import Path
 sys.path.append(str(Path(__file__).parents[1])+'/Database/')
 import DB_FUNCTION as DB
+import subprocess 

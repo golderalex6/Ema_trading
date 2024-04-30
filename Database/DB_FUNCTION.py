@@ -5,14 +5,22 @@ conn=sql.connect(str(Path(__file__).parent)+'/Main.db')
 cursor=conn.cursor()
 #-----------Database connection
 
-def insert_db(table,para,multi=False):
-    if multi:
+def insert_db(table,para,multitable=False,multivalues=False):
+    if multitable :
         for i in range(len(table)): 
             p_len=','.join(['?']*len(para[i]))
-            cursor.execute(f'insert into {table[i]} values ({p_len})',para[i])
+            if multivalues:
+                p_len=','.join(['?']*len(para[i][0]))
+                cursor.executemany(f'insert into {table[i]} values ({p_len})',para[i])
+            else:
+                cursor.execute(f'insert into {table[i]} values ({p_len})',para[i])
     else:
         p_len=','.join(['?']*len(para))
-        cursor.execute(f"insert into {table} values ({p_len})",para)
+        if multivalues:
+            p_len=','.join(['?']*len(para[0]))
+            cursor.executemany(f"insert into {table} values ({p_len})",para)
+        else:
+            cursor.execute(f"insert into {table} values ({p_len})",para)
     conn.commit()
 
 def query_db(query_str):
