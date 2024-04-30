@@ -42,7 +42,12 @@ def Draw(tf):
         round_time()
         plt.clear_figure()
 def Main():
-    tf=input('Please select your timeframe:')
+    check_len=len(sys.argv)
+    if check_len==1:
+        tf=input('Please select your timeframe:')
+    else:
+        tf=sys.argv[1]
+
     while tf not in PARA.col:
         tf=input('Please try again:')
     try:

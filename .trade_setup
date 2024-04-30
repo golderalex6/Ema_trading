@@ -1,0 +1,3 @@
+screen -t Data python3 /Working/Trading/data.py
+screen -t Trade python3 /Working/Trading/trade.py 1m
+screen -t Chart python3 /Working/Chart/main.py 1m

@@ -26,9 +26,16 @@ def trading_log(date:str,order_type:str,amount:float,open:float,close:float):
 
 def Trade()->None:
     #run the trading application
-    tf=input('Select your timeframe:')
+    check_input=len(sys.argv)
+
+    if check_input==1:
+        tf=input('Select your timeframe:')
+    else:
+        tf=sys.argv[1]
+
     while tf not in PARA.col:
         tf=input('Please choose again:')
+
     old_ema=DB.query_db(f'select * from Ema_{tf} order by Timestamp desc limit 1')
     while True:
         new_ema=DB.query_db(f'select * from Ema_{tf} order by Timestamp desc limit 1')
