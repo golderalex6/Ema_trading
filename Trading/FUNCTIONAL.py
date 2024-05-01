@@ -36,4 +36,11 @@ def cross_under(fast,slow):
         return True
     return False
 
+def round_time(r,sec=60):
+    #wait to the nearest time frame
+
+    n=dt.datetime.now().timestamp()
+    gap=ceil((n-PARA.standard_sec)/sec)*sec-(n-PARA.standard_sec)
+    sleep(gap+r)
+
 

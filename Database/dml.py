@@ -5,7 +5,7 @@ conn=sql.connect(os.path.join(__location__,'Main.db'))
 cursor=conn.cursor()
 
 sql_str='''
-select * from Ema_1m order by Timestamp desc limit 1
+select * from  
 '''
 
 cursor.execute(sql_str)

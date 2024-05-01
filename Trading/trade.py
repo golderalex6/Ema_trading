@@ -24,18 +24,8 @@ def trading_log(date:str,order_type:str,amount:float,open:float,close:float):
     history_log=[date,order_type,total_fee,amount,open,close,win_per,win_usd]
     DB.insert_db('History',history_log)
 
-def Trade()->None:
+def Trade(tf)->None:
     #run the trading application
-    check_input=len(sys.argv)
-
-    if check_input==1:
-        tf=input('Select your timeframe:')
-    else:
-        tf=sys.argv[1]
-
-    while tf not in PARA.col:
-        tf=input('Please choose again:')
-
     old_ema=DB.query_db(f'select * from Ema_{tf} order by Timestamp desc limit 1')
     while True:
         new_ema=DB.query_db(f'select * from Ema_{tf} order by Timestamp desc limit 1')
@@ -43,7 +33,7 @@ def Trade()->None:
             fast_old,slow_old=old_ema[0][PARA.ema_fast+1],old_ema[0][PARA.ema_slow+1]
             fast_new,slow_new=new_ema[0][PARA.ema_fast+1],new_ema[0][PARA.ema_slow+1]
             fast,slow=[fast_old,fast_new],[slow_old,slow_new]
-            
+            # print(fast,slow)
             now=dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S')
             open_order=DB.query_db('select * from Open_order')
             #reduce number of requests created
@@ -89,8 +79,15 @@ def Trade()->None:
 
 def Main():
     #Error handling
+    check_input=len(sys.argv)
+    if check_input==1:
+        tf=input('Select your timeframe:')
+    else:
+        tf=sys.argv[1]
+    while tf not in PARA.col:
+        tf=input('Please choose again:')
     try:
-        Trade()
+        Trade(tf)
     except Exception as e:
         error_str='Error from trade.py '+str(e)
         ERROR.send_error(error_str)

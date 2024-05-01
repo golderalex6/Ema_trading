@@ -5,15 +5,6 @@ sys.path.append(root+'/Trading/')
 import plotext as plt
 from IMPORT import *
 #-----------Function
-def round_time():
-    #wait to the nearest time frame
-    DELAY=10
-    sec=60
-    n=dt.datetime.now().timestamp()
-
-    gap=ceil((n-PARA.standard_sec)/sec)*sec-(n-PARA.standard_sec)
-    sleep(gap+DELAY)
-
 def Draw(tf):
     while True:            
         price=DB.query_db(f'select * from Price_{tf}')
@@ -36,11 +27,13 @@ def Draw(tf):
         plt.plot(day,ema_slow,color='purple',marker='fhd',label=f'Ema:{PARA.ema_slow}')
         plt.candlestick(day,candle )
         plt.theme('matrix')
+        plt.grid(True,True)
         plt.title(tf)
         plt.show()
 
-        round_time()
+        F.round_time(20)
         plt.clear_figure()
+#-----------Function
 def Main():
     check_len=len(sys.argv)
     if check_len==1:

@@ -9,14 +9,6 @@ exchange = exchange_class({
 #-----------Normal setup
 
 #-----------Function
-def round_time(r):
-    #wait to the nearest time frame
-
-    sec=60
-    n=dt.datetime.now().timestamp()
-    gap=ceil((n-PARA.standard_sec)/sec)*sec-(n-PARA.standard_sec)
-    sleep(gap+r)
-
 def get_and_compare_data(tf):
     #get the new data and make sure not get the duplicate data
     latest=DB.query_db(f'select Timestamp from Price_{tf} order by Timestamp desc limit 1')
@@ -50,7 +42,7 @@ def calculate_and_distribute():
 def Main():
     #Error handling
     while True:
-        round_time(0)
+        F.round_time(0)
         try:
             calculate_and_distribute()
         except Exception as e:

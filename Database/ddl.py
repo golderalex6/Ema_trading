@@ -1590,6 +1590,7 @@ end;
 create table History(
 Date text primary key,
 [Order type] text not null,
+[Total fee] real not null,
 Amount real not null,
 Open real not null,
 Close real not null,
