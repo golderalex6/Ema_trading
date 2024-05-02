@@ -1,11 +1,13 @@
 from IMPORT import *
 
-def handle_ohlvc(raw):
+def handle_ohlvc(raw,timeframe):
     #convert raw data crawled from binance to dataframe pandas for easy process
 
     df=pd.DataFrame(raw,columns=['Timestamp','Open','High','Low','Close','Volume'])
     df['Date']=df['Timestamp'].map(lambda x:dt.datetime.strftime(dt.datetime.fromtimestamp(x/1000),'%Y/%m/%d %H:%M:%S'))
     df['Timestamp']=df['Timestamp']/1000
+    df['Timeframe']=timeframe
+    df=df[['Date','Timestamp','Timeframe','Open','High','Low','Close','Volume']]
     return df
 
 def updated_columns():

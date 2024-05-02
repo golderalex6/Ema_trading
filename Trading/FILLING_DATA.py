@@ -17,6 +17,8 @@ def get_history_bars(symbol, interval, start_time:int, end_time:int):
     df['Close']=df['Close'].astype(float)
     df['Volume']=df['Volume'].astype(float)
     df['Timestamp']=df['Timestamp']/1000
+    df['Timeframe']=interval
+    df=df[['Date','Timestamp','Timeframe','Open','High','Low','Close','Volume']]
 
     return df
 def filling_data():
@@ -33,18 +35,18 @@ def filling_data():
         date=data['Date'].values
 
         Ema=[]
-        first_val=[date[0],timestamp[0]]
+        first_val=[date[0],timestamp[0],tf]
         first_val.extend([close_price[0]]*100)
         Ema.append(first_val)
 
         for i in range(1,len(close_price)):
-            old_ema=Ema[-1][2:]
+            old_ema=Ema[-1][3:]
             new_ema=(np.multiply(k,close_price[i])+np.multiply((1-k),old_ema)).tolist()
+            new_ema.insert(0,tf)
             new_ema.insert(0,timestamp[i])
             new_ema.insert(0,date[i])
             Ema.append(new_ema)
-
-        DB.insert_db([f'Price_{tf}',f'Ema_{tf}'],[price_val,Ema],True,True)
+        DB.insert_db([f'Price',f'Ema'],[price_val,Ema],True,True)
     print('Filled done !!,start draw and trade')
 
 def round_time(r):

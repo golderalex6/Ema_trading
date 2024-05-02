@@ -18,5 +18,8 @@ import sys
 from INDICATOR import Ema
 from pathlib import Path
 sys.path.append(str(Path(__file__).parents[1])+'/Database/')
+sys.path.append(str(Path(__file__).parents[1]))
 import DB_FUNCTION as DB
+import HYPERPARAMETER as HYPER
 import subprocess 
+

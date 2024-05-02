@@ -1,14 +1,4 @@
 from IMPORT import *
-#-----------Main Parameter
-ema_fast=7
-ema_slow=70
-symbol='BTC/USDT:USDT'
-timeframe='1m'
-type='Close'
-balance=150
-#-----------Main Parameter
-
-#-----------Normal setup
 api_key=os.getenv('key_main')
 secret=os.getenv('secret_main')
 sheet_id='1Wp4cpdJpK3LKhI9Cf0_iRxJMzZ08YbdGaOlukZzgZLE'
@@ -34,4 +24,3 @@ sheet_code={
         '12h':1111891270,
         '1d':878999563,
         }
-#-----------Normal setup
