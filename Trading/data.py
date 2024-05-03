@@ -12,13 +12,18 @@ exchange = exchange_class({
 def get_and_compare_data(tf):
     #get the new data and make sure not get the duplicate data
     latest=DB.query_db(f"select Timestamp from Price where Timeframe='{tf}' order by Timestamp desc limit 1")
+    lim=0
     while True:
         try:
+            lim+=1
             get=F.handle_ohlvc([exchange.fetch_ohlcv(HYPER.symbol,tf,limit=2)[0]],tf)
             if len(latest)!=0:
                 if latest[0][0]==get['Timestamp'].values[0]:raise
             break
         except:
+            #check to prevent infinite loop
+            if lim>=100:
+                raise 
             sleep(0.5)
     return get.values[0]
 
@@ -34,7 +39,7 @@ def calculate_and_distribute():
         old_ema=[price[6]]*100 if len(old_ema)==0 else old_ema[0][3:]
         new_ema=Ema(price[6],old_ema,price[1],price[0],tf)
         #Database
-        DB.insert_db([f'Price',f'Ema'],[price,new_ema],True)
+        DB.insert_db(['Price','Ema'],[price,new_ema],True)
 
     print(dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S'))
     print('Updated timeframe :',update_col)
