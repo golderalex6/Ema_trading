@@ -12,19 +12,14 @@ exchange = exchange_class({
 def get_and_compare_data(tf):
     #get the new data and make sure not get the duplicate data
     latest=DB.query_db(f"select Timestamp from Price where Timeframe='{tf}' order by Timestamp desc limit 1")
-    lim=0
     while True:
-        try:
-            lim+=1
-            get=F.handle_ohlvc([exchange.fetch_ohlcv(HYPER.symbol,tf,limit=2)[0]],tf)
-            if len(latest)!=0:
-                if latest[0][0]==get['Timestamp'].values[0]:raise
-            break
-        except:
-            #check to prevent infinite loop
-            if lim>=100:
-                raise 
-            sleep(0.5)
+        req=exchange.fetch_ohlcv(HYPER.symbol,tf,limit=2)
+        get=F.handle_ohlvc([req[0]],tf)
+        if len(latest)!=0:
+            if latest[0][0]==get['Timestamp'].values[0]:
+                continue
+        break
+        #check to prevent infinite loop
     return get.values[0]
 
 
