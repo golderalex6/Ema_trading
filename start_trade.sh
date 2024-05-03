@@ -2,7 +2,7 @@
 
 root=`pwd`
 check=`python3 $root/.trade_setup.py`
-if [ $check=='ERROR' ]
+if [ "$check" == "ERROR" ]
 then
 	echo 'Your hyperparameter is invalid !!'
 	exit
