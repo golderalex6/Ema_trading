@@ -1,54 +1,38 @@
 from IMPORT import * 
-#-----------Normal setup
-exchange_id = 'binance'
-exchange_class = getattr(ccxt, exchange_id)
-exchange = exchange_class({
-    'apiKey': PARA.api_key ,
-    'secret': PARA.secret ,
-})
-#-----------Normal setup
-
 #-----------Function
-def get_and_compare_data(tf):
-    #get the new data and make sure not get the duplicate data
-    latest=DB.query_db(f"select Timestamp from Price where Timeframe='{tf}' order by Timestamp desc limit 1")
-    while True:
-        req=exchange.fetch_ohlcv(HYPER.symbol,tf,limit=2)
-        get=F.handle_ohlvc([req[0]],tf)
-        if len(latest)!=0:
-            if latest[0][0]==get['Timestamp'].values[0]:
-                continue
-        break
-        #check to prevent infinite loop
-    return get.values[0]
+async def calculate_and_distribute():
+    #get the uri of all columns
+    uri='wss://fstream.binance.com/stream?streams='
+    uri+='/'.join(list(map(lambda x:f'{HYPER.symbol.lower()}@kline_{x}',PARA.col)))
+    async with websockets.connect(uri) as ws:
+        while True:
+            #get the kline and check if the kline is done or not
+            raw=json.loads(await ws.recv())
+            dat=raw['data']['k']
+            done=dat['x']
+            if done:
+                #distribute to dabase
+                date,timestamp,tf=dt.datetime.strftime(dt.datetime.fromtimestamp(dat['t']/1000),'%Y/%m/%d %H:%M:%S'),dat['t'],dat['i']
+                open,high,low,close,volume=dat['o'],dat['h'],dat['l'],dat['c'],dat['v']
+                price=[date,timestamp,tf,open,high,low,close,volume]
 
+                #Ema
+                old_ema=DB.query_db(f"select * from Ema where Timeframe='{tf}' order by Timestamp desc limit 1")
+                old_ema=[close]*100 if len(old_ema)==0 else old_ema[0][3:]
+                new_ema=Ema(close,old_ema,date,timestamp,tf)
 
-def calculate_and_distribute():
-
-    update_col=F.updated_columns()
-    for tf in update_col:
-
-        price=get_and_compare_data(tf)
-        #Ema
-        old_ema=DB.query_db(f"select * from Ema where Timeframe='{tf}' order by Timestamp desc limit 1")
-        old_ema=[price[6]]*100 if len(old_ema)==0 else old_ema[0][3:]
-        new_ema=Ema(price[6],old_ema,price[1],price[0],tf)
-        #Database
-        DB.insert_db(['Price','Ema'],[price,new_ema],True)
-
-    print(dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S'))
-    print('Updated timeframe :',update_col)
+                #Database
+                DB.insert_db(['Price','Ema'],[price,new_ema],True)
+                print(dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S'),tf)
 
 def Main():
     #Error handling
-    while True:
-        F.round_time(0)
-        try:
-            calculate_and_distribute()
-        except Exception as e:
-            error_str='Error from Trading/data.py :'+ str(e)
-            ERROR.send_error(error_str)
-            raise
+    try:
+        asyncio.run(calculate_and_distribute())
+    except Exception as e:
+        error_str='Error from Trading/data.py :'+ str(e)
+        ERROR.send_error(error_str)
+        raise
 #-----------Function
 
 if __name__=="__main__":

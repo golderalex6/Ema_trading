@@ -1,7 +1,7 @@
 from IMPORT import *
 
 #-----------Function
-def Ema(price:float,old_ema:list,timestamp,date,timeframe):
+def Ema(price:float,old_ema:list,date,timestamp,timeframe):
     #Calculate the Ema values
 
     new_values=np.array([price]*100,dtype='float')
