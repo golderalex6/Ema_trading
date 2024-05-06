@@ -6,3 +6,4 @@ python-dotenv
 django
 binance-futures-connector
 plotext
+websockets
