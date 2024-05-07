@@ -25,15 +25,28 @@ async def calculate_and_distribute():
                 DB.insert_db(['Price','Ema'],[price,new_ema],True)
                 print(dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S'),tf)
 
-def Main():
-    #Error handling
+async def auto_reconnect(r,sec=60):
+    #destroy all asyncio task to disconnect to binance websocket 
+    n=dt.datetime.now().timestamp()
+    gap=ceil((n-PARA.standard_sec)/sec)*sec-(n-PARA.standard_sec)
+    await asyncio.sleep(gap+r)
+    for i in asyncio.all_tasks():
+        i.cancel()
+
+async def main():
+    #create a try catch to after disconnect and connect again
+    while True:
+        try:
+            await asyncio.gather(calculate_and_distribute(),auto_reconnect(20,7200))
+        except:
+            print(dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M')+': Reconnect to binance websocket')
+            continue
+#-----------Function
+
+if __name__=="__main__":
     try:
-        asyncio.run(calculate_and_distribute())
+        asyncio.run(main())
     except Exception as e:
         error_str='Error from Trading/data.py :'+ str(e)
         ERROR.send_error(error_str)
         raise
-#-----------Function
-
-if __name__=="__main__":
-    Main()

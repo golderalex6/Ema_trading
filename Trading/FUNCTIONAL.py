@@ -45,4 +45,14 @@ def round_time(r,sec=60):
     gap=ceil((n-PARA.standard_sec)/sec)*sec-(n-PARA.standard_sec)
     sleep(gap+r)
 
+def time_delta(start):
+    start_date=dt.datetime.strftime(start,'%Y/%m/%d %H:%M')
+    delta_sec=int(dt.datetime.now().timestamp()-start.timestamp())
+    time_to_sec=[86400,3600,60]
+    delta=[]
+    for i in time_to_sec:
+        delta.append(int(delta_sec/i))
+        delta_sec=delta_sec%i
+    return f"Start time:{start_date}\nRun time:{delta[0]}d:{delta[1]}h:{delta[2]}m\n"
+
 
