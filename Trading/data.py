@@ -39,7 +39,7 @@ async def main():
         try:
             await asyncio.gather(calculate_and_distribute(),auto_reconnect(20,7200))
         except:
-            print(dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M')+': Reconnect to binance websocket')
+            print(dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S')+': Reconnect to binance websocket')
             continue
 #-----------Function
 

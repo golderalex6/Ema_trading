@@ -1,15 +1,22 @@
 from IMPORT import *
 
 def main():
+    start=dt.datetime.now()
     while True:
-        prcs=subprocess.run('ps -fA | grep .py',shell=True,capture_output=True)
+        error=False
+        for tf in HYPER.timeframe :
+            prcs=subprocess.run(f'ps -fA | grep {tf}',shell=True,capture_output=True)
+            text=prcs.stdout.decode('utf8').split('\n')
+            if len(text)!=6:
+                error=True
+        prcs=subprocess.run(f'ps -fA | grep Trading/data.py',shell=True,capture_output=True)
         text=prcs.stdout.decode('utf8').split('\n')
-        start=dt.datetime.now()
-        if len(HYPER.timeframe)*3+5!=len(text):
+        if len(text)!=4:
+            error=True
+        if error:
             error_str=F.time_delta(start)
-            print(len(text),len(HYPER.timeframe)*3+6,text)
             raise Exception('The computer has stopped some application without/with python error:\n'+error_str)
-        sleep(5)
+        sleep(60)
 if __name__=='__main__':
     try:
         main()

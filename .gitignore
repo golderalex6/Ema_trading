@@ -4,3 +4,4 @@ Indicator/*.csv
 *.csv
 *.db
 RAW.txt
+*.log

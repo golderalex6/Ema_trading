@@ -1,4 +1,5 @@
 screen -t Data python3 /Working/Trading/data.py
+screen -t Ping-process python3 /Working/Trading/ping_process.py
 screen -t Trade-1m python3 /Working/Trading/trade.py 1m
 screen -t Chart-1m python3 /Working/Chart/main.py 1m
 screen -t Report-1m python3 /Working/Report/main.py 1m
