@@ -33,13 +33,12 @@ async def auto_reconnect(r,sec=60):
 
 async def main():
     #create a try catch to after disconnect and connect again
-    await asyncio.gather(calculate_and_distribute(),auto_reconnect(20,7200))
-    # while True:
-    #     try:
-    #         await asyncio.gather(calculate_and_distribute(),auto_reconnect(20,7200))
-    #     except:
-    #         print(dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S')+': Reconnect to binance websocket')
-    #         continue
+    while True:
+        try:
+            await asyncio.gather(calculate_and_distribute(),auto_reconnect(20,7200))
+        except:
+            print(dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S')+': Reconnect to binance websocket')
+            continue
 #-----------Function
 
 if __name__=="__main__":
