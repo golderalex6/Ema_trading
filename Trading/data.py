@@ -17,12 +17,10 @@ async def calculate_and_distribute():
                 price=[date,timestamp,tf,open,high,low,close,volume]
 
                 #Ema
-                old_ema=DB.query_db(f"select * from Ema where Timeframe='{tf}' order by Timestamp desc limit 1")
-                old_ema=[close]*100 if len(old_ema)==0 else old_ema[0][3:]
-                new_ema=Ema(close,old_ema,date,timestamp,tf)
+                Ema(close,date,timestamp,tf)
 
                 #Database
-                DB.insert_db(['Price','Ema'],[price,new_ema],True)
+                DB.insert_db('Price',price)
                 print(dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S'),tf)
 
 async def auto_reconnect(r,sec=60):
@@ -35,12 +33,13 @@ async def auto_reconnect(r,sec=60):
 
 async def main():
     #create a try catch to after disconnect and connect again
-    while True:
-        try:
-            await asyncio.gather(calculate_and_distribute(),auto_reconnect(20,7200))
-        except:
-            print(dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S')+': Reconnect to binance websocket')
-            continue
+    await asyncio.gather(calculate_and_distribute(),auto_reconnect(20,7200))
+    # while True:
+    #     try:
+    #         await asyncio.gather(calculate_and_distribute(),auto_reconnect(20,7200))
+    #     except:
+    #         print(dt.datetime.strftime(dt.datetime.now(),'%Y/%m/%d %H:%M:%S')+': Reconnect to binance websocket')
+    #         continue
 #-----------Function
 
 if __name__=="__main__":

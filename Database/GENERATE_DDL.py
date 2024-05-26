@@ -8,8 +8,8 @@ u=''
 # for Ema
 u+=f'create table Ema(\n'
 u+='Date text not null,\n'
-u+='Timestamp int primary key,\n'
-u+='Timeframe text not null,'
+u+='Timestamp int,\n'
+u+='Timeframe text not null,\n'
 for v in range(1,101):
     if v==100:
         u+=f'Ema_{v} real not null \n'
@@ -21,13 +21,13 @@ u+=');\n\n'
 u+=f'''
 create table Price(
 Date text not null,
-Timestamp int primary key,
+Timestamp int ,
+Timeframe text not null,
 Open real not null,
 High real not null,
 Low real not null,
 Close real not null,
-Volume real not null,
-Date text not null
+Volume real not null
 );
 '''
 
@@ -37,9 +37,8 @@ create trigger check_length_ema
 after insert
 on Ema
 begin'''
-for tf in col:
-    u+=f'''
-    delete from Ema where Timestamp in (select Timestamp from Ema where Timeframe='{tf}' order by Timestamp limit 1) and Timeframe='{tf}' and (select count(*) from Ema where Timeframe='{tf}')>120;\n
+u+=f'''
+    delete from Ema where Timestamp in (select Timestamp from Ema where Timeframe=NEW.Timeframe order by Timestamp limit 1) and Timeframe=NEW.Timeframe and (select count(*) from Ema where Timeframe=NEW.Timeframe)>120;\n
 '''
 
 u+='''\nend;\n'''
@@ -50,9 +49,8 @@ create trigger check_length_price
 after insert
 on Price
 begin'''
-for tf in col:
-    u+=f'''
-    delete from Price where Timestamp in (select Timestamp from Price where Timeframe='{tf}' order by Timestamp limit 1) and Timeframe="{tf}" and (select count(*) from Price where Timeframe='{tf}')>120;\n
+u+=f'''
+    delete from Price where Timestamp in (select Timestamp from Price where Timeframe=NEW.Timeframe order by Timestamp limit 1) and Timeframe=NEW.Timeframe and (select count(*) from Price where Timeframe=NEW.Timeframe)>120;\n
 '''
 
 u+='''\nend;\n'''

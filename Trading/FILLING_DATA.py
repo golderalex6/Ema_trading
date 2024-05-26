@@ -34,19 +34,20 @@ def filling_data():
         timestamp=data['Timestamp'].values
         date=data['Date'].values
 
-        Ema=[]
-        first_val=[date[0],timestamp[0],tf]
-        first_val.extend([close_price[0]]*100)
-        Ema.append(first_val)
+#         Ema=[]
+#         first_val=[date[0],timestamp[0],tf]
+#         first_val.extend([close_price[0]]*100)
+#         Ema.append(first_val)
 
-        for i in range(1,len(close_price)):
-            old_ema=Ema[-1][3:]
-            new_ema=(np.multiply(k,close_price[i])+np.multiply((1-k),old_ema)).tolist()
-            new_ema.insert(0,tf)
-            new_ema.insert(0,timestamp[i])
-            new_ema.insert(0,date[i])
-            Ema.append(new_ema)
-        DB.insert_db([f'Price',f'Ema'],[price_val,Ema],True,True)
+        for i in range(len(close_price)):
+            # old_ema=Ema[-1][3:]
+            # new_ema=(np.multiply(k,close_price[i])+np.multiply((1-k),old_ema)).tolist()
+            # new_ema.insert(0,tf)
+            # new_ema.insert(0,timestamp[i])
+            # new_ema.insert(0,date[i])
+            # Ema.append(new_ema)
+            Ema(close_price[i],date[i],timestamp[i],tf)
+        DB.insert_db('Price',price_val,False,True)
     print('Filled done !!,start draw and trade')
 
 def round_time(r):

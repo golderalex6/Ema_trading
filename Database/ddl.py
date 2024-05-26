@@ -13,7 +13,7 @@ cursor=conn.cursor()
 sql_str='''
 create table Ema(
 Date text not null,
-Timestamp int not null,
+Timestamp int,
 Timeframe text not null,
 Ema_1 real not null,
 Ema_2 real not null,
@@ -117,28 +117,10 @@ Ema_99 real not null,
 Ema_100 real not null 
 );
 
-create trigger check_length_ema
-after insert
-on Ema
-begin
-    delete from Ema where Timestamp in (select Timestamp from Ema where Timeframe='1m' order by Timestamp limit 1) and Timeframe='1m' and (select count(*) from Ema where Timeframe='1m')>120;
-    delete from Ema where Timestamp in (select Timestamp from Ema where Timeframe='3m' order by Timestamp limit 1) and Timeframe='3m' and (select count(*) from Ema where Timeframe='3m')>120; 
-    delete from Ema where Timestamp in (select Timestamp from Ema where Timeframe='5m' order by Timestamp limit 1) and Timeframe='5m' and (select count(*) from Ema where Timeframe='5m')>120; 
-    delete from Ema where Timestamp in (select Timestamp from Ema where Timeframe='15m' order by Timestamp limit 1) and Timeframe='15m' and (select count(*) from Ema where Timeframe='15m')>120; 
-    delete from Ema where Timestamp in (select Timestamp from Ema where Timeframe='30m' order by Timestamp limit 1) and Timeframe='30m' and (select count(*) from Ema where Timeframe='30m')>120; 
-    delete from Ema where Timestamp in (select Timestamp from Ema where Timeframe='1h' order by Timestamp limit 1) and Timeframe='1h' and (select count(*) from Ema where Timeframe='1h')>120; 
-    delete from Ema where Timestamp in (select Timestamp from Ema where Timeframe='2h' order by Timestamp limit 1) and Timeframe='2h' and (select count(*) from Ema where Timeframe='2h')>120; 
-    delete from Ema where Timestamp in (select Timestamp from Ema where Timeframe='4h' order by Timestamp limit 1) and Timeframe='4h' and (select count(*) from Ema where Timeframe='4h')>120; 
-    delete from Ema where Timestamp in (select Timestamp from Ema where Timeframe='6h' order by Timestamp limit 1) and Timeframe='6h' and (select count(*) from Ema where Timeframe='6h')>120; 
-    delete from Ema where Timestamp in (select Timestamp from Ema where Timeframe='8h' order by Timestamp limit 1) and Timeframe='8h' and (select count(*) from Ema where Timeframe='8h')>120; 
-    delete from Ema where Timestamp in (select Timestamp from Ema where Timeframe='12h' order by Timestamp limit 1) and Timeframe='12h' and (select count(*) from Ema where Timeframe='12h')>120; 
-    delete from Ema where Timestamp in (select Timestamp from Ema where Timeframe='1d' order by Timestamp limit 1) and Timeframe='1d' and (select count(*) from Ema where Timeframe='1d')>120; 
-
-end;
 
 create table Price(
 Date text not null,
-Timestamp int not null,
+Timestamp int ,
 Timeframe text not null,
 Open real not null,
 High real not null,
@@ -147,22 +129,21 @@ Close real not null,
 Volume real not null
 );
 
+create trigger check_length_ema
+after insert
+on Ema
+begin
+    delete from Ema where Timestamp in (select Timestamp from Ema where Timeframe=NEW.Timeframe order by Timestamp limit 1) and Timeframe=NEW.Timeframe and (select count(*) from Ema where Timeframe=NEW.Timeframe)>120;
+
+
+end;
+
 create trigger check_length_price
 after insert
 on Price
 begin
-    delete from Price where Timestamp in (select Timestamp from Price where Timeframe='1m' order by Timestamp limit 1) and Timeframe="1m" and (select count(*) from Price where Timeframe='1m')>120; 
-    delete from Price where Timestamp in (select Timestamp from Price where Timeframe='3m' order by Timestamp limit 1) and Timeframe='3m' and (select count(*) from Price where Timeframe='3m')>120; 
-    delete from Price where Timestamp in (select Timestamp from Price where Timeframe='5m' order by Timestamp limit 1) and Timeframe='5m' and (select count(*) from Price where Timeframe='5m')>120; 
-    delete from Price where Timestamp in (select Timestamp from Price where Timeframe='15m' order by Timestamp limit 1) and Timeframe='15m' and (select count(*) from Price where Timeframe='15m')>120; 
-    delete from Price where Timestamp in (select Timestamp from Price where Timeframe='30m' order by Timestamp limit 1) and Timeframe='30m' and (select count(*) from Price where Timeframe='30m')>120; 
-    delete from Price where Timestamp in (select Timestamp from Price where Timeframe='1h' order by Timestamp limit 1) and Timeframe='1h' and (select count(*) from Price where Timeframe='1h')>120; 
-    delete from Price where Timestamp in (select Timestamp from Price where Timeframe='2h' order by Timestamp limit 1) and Timeframe='2h' and (select count(*) from Price where Timeframe='2h')>120; 
-    delete from Price where Timestamp in (select Timestamp from Price where Timeframe='4h' order by Timestamp limit 1) and Timeframe='4h' and (select count(*) from Price where Timeframe='4h')>120; 
-    delete from Price where Timestamp in (select Timestamp from Price where Timeframe='6h' order by Timestamp limit 1) and Timeframe='6h' and (select count(*) from Price where Timeframe='6h')>120; 
-    delete from Price where Timestamp in (select Timestamp from Price where Timeframe='8h' order by Timestamp limit 1) and Timeframe='8h' and (select count(*) from Price where Timeframe='8h')>120; 
-    delete from Price where Timestamp in (select Timestamp from Price where Timeframe='12h' order by Timestamp limit 1) and Timeframe='12h' and (select count(*) from Price where Timeframe='12h')>120; 
-    delete from Price where Timestamp in (select Timestamp from Price where Timeframe='1d' order by Timestamp limit 1) and Timeframe='1d' and (select count(*) from Price where Timeframe='1d')>120; 
+    delete from Price where Timestamp in (select Timestamp from Price where Timeframe=NEW.Timeframe order by Timestamp limit 1) and Timeframe=NEW.Timeframe and (select count(*) from Price where Timeframe=NEW.Timeframe)>120;
+
 
 end;
 
@@ -180,12 +161,14 @@ create table History(
     [Win USDT] real not null
 );
 
+
 /*Open_order*/
 create table Open_order(
 [Order type] text not null,
 Amount real not null,
 [Open price] real not null
 )
+
 '''
 
 cursor.executescript(sql_str)

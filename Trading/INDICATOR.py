@@ -1,8 +1,10 @@
 from IMPORT import *
 
 #-----------Function
-def Ema(price:float,old_ema:list,date,timestamp,timeframe):
+def Ema(price:float,date,timestamp,timeframe):
     #Calculate the Ema values
+    old_ema=DB.query_db(f"select * from Ema where Timeframe='{timeframe}' order by Timestamp desc limit 1")
+    old_ema=[price]*100 if len(old_ema)==0 else old_ema[0][3:]
 
     new_values=np.array([price]*100,dtype='float')
     old_values=np.array(old_ema,dtype='float')
@@ -12,7 +14,8 @@ def Ema(price:float,old_ema:list,date,timestamp,timeframe):
     new_ema.insert(0,timeframe)
     new_ema.insert(0,timestamp)
     new_ema.insert(0,date)
-    return new_ema
+
+    DB.insert_db('Ema',new_ema)
 #-----------Function
 
 if __name__=="__main__":
