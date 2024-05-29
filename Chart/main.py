@@ -4,6 +4,7 @@ root=str(Path(__file__).parents[1])
 sys.path.append(root+'/Trading/')
 import plotext as plt
 from IMPORT import *
+plt.date_form('Y/m/d H:M:S')
 #-----------Function
 def Draw(tf):
     while True:            
