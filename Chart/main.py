@@ -4,7 +4,6 @@ root=str(Path(__file__).parents[1])
 sys.path.append(root+'/Trading/')
 import plotext as plt
 from IMPORT import *
-plt.date_form('Y/m/d H:M:S')
 #-----------Function
 def Draw(tf):
     while True:            
@@ -15,6 +14,7 @@ def Draw(tf):
         ema_fast=list(map(lambda x:x[0],ema_fast))
         ema_slow=list(map(lambda x:x[0],ema_slow))
         day=list(map(lambda x:x[0],price))
+        plt.date_form('Y/m/d H:M:S')
         #Draw B/S order
         for i in range(len(ema_fast)-2):
             fast=ema_fast[i:i+2]
