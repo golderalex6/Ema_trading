@@ -1,6 +1,27 @@
 from IMPORT import *
 
 #-----------Function
+def get_history_bars(symbol, interval, start_time:int, end_time:int):
+
+    url = f"https://data-api.binance.vision/api/v3/klines?symbol={symbol}&interval={interval}&startTime={start_time}&endTime={end_time}&limit=1000"
+    df=pd.DataFrame(requests.get(url).json())
+    if (len(df.index)==0):
+        return None
+
+    df=df.iloc[:, 0:6]
+    df.columns = ['Timestamp', 'Open', 'High', 'Low', 'Close', 'Volume']
+    df['Date'] = [dt.datetime.strftime(dt.datetime.fromtimestamp(x/1000.0),'%Y/%m/%d %H:%M:%S') for x in df['Timestamp']]
+    df['Open']=df['Open'].astype(float)
+    df['High']=df['High'].astype(float)
+    df['Low']=df['Low'].astype(float)
+    df['Close']=df['Close'].astype(float)
+    df['Volume']=df['Volume'].astype(float)
+    df['Timestamp']=df['Timestamp']/1000
+    df['Timeframe']=interval
+    df=df[['Date','Timestamp','Timeframe','Open','High','Low','Close','Volume']]
+
+    return df
+
 def filling_data():
     #filling the missing data
     k=np.array([2/(i+1) for i in range(1,101)])
@@ -11,7 +32,8 @@ def filling_data():
         data=get_history_bars(HYPER.symbol,tf,start_time,nearest_tf)
         price_val=data.values.tolist()
         close_price=data['Close'].values
-        timestamp=data['Timestamp'].values date=data['Date'].values
+        timestamp=data['Timestamp'].values 
+        date=data['Date'].values
 
         for i in range(len(close_price)):
             Ema(close_price[i],date[i],timestamp[i],tf)
