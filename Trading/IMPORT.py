@@ -12,15 +12,17 @@ from binance.um_futures import UMFutures
 load_dotenv()
 from math import *
 import requests
-import PARAMETER as PARA
-import FUNCTIONAL as F
 import sqlite3 as sql
-import ERROR
 import sys
+import subprocess
+
 from pathlib import Path
 sys.path.append(str(Path(__file__).parents[1])+'/Database/')
 sys.path.append(str(Path(__file__).parents[1]))
+sys.path.append(str(Path(__file__).parents[2]))
+import PARAMETER as PARA
+import ERROR
+import FUNCTIONAL as F
 import DB_FUNCTION as DB
 from INDICATOR import Ema
 import HYPERPARAMETER as HYPER
-import subprocess 

@@ -11,14 +11,14 @@ def get_data(i,delta,tf):
 
 def calculate_and_distribute(i,delta):
     #fake data but only work on 1m timeframe
+
+    plt.date_form('Y/m/d H:M:S')
     tf='1h'
     price=get_data(i,delta,tf)
     #Ema
-    old_ema=DB.query_db(f"select * from Ema where Timeframe='{tf}' order by Timestamp desc limit 1")
-    old_ema=[price[6]]*100 if len(old_ema)==0 else old_ema[0][3:]
-    new_ema=Ema(price[6],old_ema,price[1],price[0],tf)
+    new_ema=Ema(price[6],price[1],price[0],tf)
     #Database
-    DB.insert_db([f'Price',f'Ema'],[price,new_ema],True)
+    DB.insert_db('Price',price)
     #Get and handle data
     price=DB.query_db(f"select * from Price where Timeframe='{tf}'")
     ema_fast=DB.query_db(f"select Ema_{HYPER.ema_fast} from Ema where Timeframe='{tf}'")

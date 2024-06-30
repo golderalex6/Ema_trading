@@ -6,12 +6,12 @@ cursor=conn.cursor()
 
 col=['1m','3m','5m','15m','30m','1h','2h','4h','6h','8h','12h','1d']
 
-for tf in col:
-    sql_str=f'''
-    select sum([Win percent]) from History where Timeframe='{tf}'
-    '''
+# for tf in col:
+sql_str=f'''
+select * from History limit 3
+'''
 
-    cursor.execute(sql_str)
-    conn.commit()
-    m=cursor.fetchall()
-    print(m)
+cursor.execute(sql_str)
+conn.commit()
+m=cursor.fetchall()
+print(m)

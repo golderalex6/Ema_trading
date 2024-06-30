@@ -13,8 +13,6 @@ def send_error(err_str):
             'Content-Type':'application/json'
             }
     s=requests.post(url,data=json.dumps(data),headers=header)
-    with open(os.path.join(__location__,'ERROR.log'),'a+') as f:
-        f.write(err_str+'\n\n')
     return s
 
 if __name__=='__main__':

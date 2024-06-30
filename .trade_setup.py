@@ -23,7 +23,7 @@ if 'code' in test:
     error='ERROR'
 
 #create screen setup for each timeframe on HYPERPARAMETER
-screen_setup=[f'screen -t Data python3 {root}/Trading/data.py',f'screen -t Ping-process python3 {root}/Trading/ping_process.py']
+screen_setup=[f'screen -t Data python3 {root}/Trading/data.py']
 for tf in HYPER.timeframe:
     screen_setup.append(f'screen -t Trade-{tf} python3 {root}/Trading/trade.py {tf}')
     screen_setup.append(f'screen -t Chart-{tf} python3 {root}/Chart/main.py {tf}')

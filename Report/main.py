@@ -37,8 +37,9 @@ def main(tf):
         plt.subplots(2,1)
         plt.subplot(1,1)
         x,y=growth_chart(tf)
+        plt.date_form('Y/m/d H:M:S')
         plt.plot(x,y,marker='fhd')
-        plt.title('Growth chart')
+        plt.title(f'Growth chart-{tf}')
         plt.theme('matrix')
 
         plt.subplot(2,1)
